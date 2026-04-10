@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Build script for Backlog Copy Helper Chrome Extension
+ * Build script for Backlog Utils Chrome Extension
  * Creates a zip file ready for Chrome Web Store upload
  */
 
@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const EXTENSION_NAME = 'backlog-copy-helper';
+const EXTENSION_NAME = 'backlog-utils';
 const BUILD_DIR = 'build';
 
 function getVersion() {

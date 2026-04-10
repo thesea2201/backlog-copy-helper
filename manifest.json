@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Backlog Copy Helper",
+  "name": "Backlog Utils",
   "version": "1.0",
-  "description": "Copy issue key, title, and summary in markdown format",
+  "description": "Utility toolkit for Backlog - copy issues, enhance workflow, and more",
   "permissions": [
     "activeTab",
     "clipboardWrite"

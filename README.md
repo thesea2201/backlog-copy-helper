@@ -1,6 +1,6 @@
-# Backlog Copy Helper
+# Backlog Utils
 
-A Chrome extension that adds a copy button to Backlog issue pages to copy issue key, title, and summary in markdown format.
+A Chrome extension toolkit for [Backlog](https://backlog.jp/) that enhances your workflow with utilities like markdown copying, and more features coming soon.
 
 ## Features
 
@@ -67,7 +67,7 @@ node build.js
 
 The build script will:
 1. Extract version from `manifest.json`
-2. Create a zip file in `build/backlog-copy-helper-v{VERSION}.zip`
+2. Create a zip file in `build/backlog-utils-v{VERSION}.zip`
 3. Include only necessary files (no dev files like `.git/`, `.github/`)
 
 ### Updating Version

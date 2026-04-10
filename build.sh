@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Build script for Backlog Copy Helper Chrome Extension
+# Build script for Backlog Utils Chrome Extension
 # Creates a zip file ready for Chrome Web Store upload
 
 set -e
@@ -16,7 +16,7 @@ if [ -z "$VERSION" ]; then
     exit 1
 fi
 
-EXTENSION_NAME="backlog-copy-helper"
+EXTENSION_NAME="backlog-utils"
 BUILD_DIR="build"
 OUTPUT_NAME="${EXTENSION_NAME}-v${VERSION}.zip"
 
