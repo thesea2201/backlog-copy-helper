@@ -2,9 +2,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-left: 8px;
+  margin-left: 48px;
   padding: 4px 10px;
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #22d3ee 0%, #67e8f9 100%);
   color: white;
   border: none;
   border-radius: 6px;
@@ -12,18 +12,18 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 2px 4px rgba(34, 211, 238, 0.3);
 }
 
 .backlog-utils-copy-btn:hover {
-  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  background: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 4px 8px rgba(34, 211, 238, 0.4);
 }
 
 .backlog-utils-copy-btn:active {
   transform: translateY(0);
-  box-shadow: 0 1px 2px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 1px 2px rgba(34, 211, 238, 0.3);
 }
 
 .backlog-utils-copy-btn svg {
