@@ -35,9 +35,47 @@ A Chrome extension that adds a copy button to Backlog issue pages to copy issue 
 **Summary:** 概要 選択した質問の回答内容をもとにAIが推奨評価ラベル・評価理由・レビューポイントを生成 実装方式 LWC + Apex + PromptTemplate
 ```
 
-## Files
+## Development
 
-- `manifest.json` - Extension configuration
-- `content.js` - Main script that injects the button and handles copying
-- `styles.css` - Styling for the button and notifications
-- `icon*.png` - Extension icons (optional, extension works without them)
+### Project Structure
+
+```
+backlog-utils/
+├── manifest.json       # Extension configuration
+├── README.md           # This file
+├── src/
+│   ├── content.js      # Main script that injects the button
+│   └── styles.css      # Styling for the button and notifications
+├── icons/
+│   ├── icon16.svg      # Toolbar icon
+│   ├── icon48.svg      # Extensions page icon
+│   └── icon128.svg     # Chrome Web Store icon
+└── build/              # Build output (generated)
+```
+
+### Building for Chrome Web Store
+
+Run the build script to create a zip file for upload:
+
+```bash
+# Using shell script
+./build.sh
+
+# Or using Node.js
+node build.js
+```
+
+The build script will:
+1. Extract version from `manifest.json`
+2. Create a zip file in `build/backlog-copy-helper-v{VERSION}.zip`
+3. Include only necessary files (no dev files like `.git/`, `.github/`)
+
+### Updating Version
+
+Before building for release, update the version in `manifest.json`:
+
+```json
+{
+  "version": "1.1"
+}
+```
