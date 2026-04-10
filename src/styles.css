@@ -1,0 +1,58 @@
+.backlog-utils-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+}
+
+.backlog-utils-copy-btn:hover {
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+}
+
+.backlog-utils-copy-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(79, 70, 229, 0.2);
+}
+
+.backlog-utils-copy-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.backlog-utils-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  background: #10b981;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.backlog-utils-notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.backlog-utils-notification.error {
+  background: #ef4444;
+}

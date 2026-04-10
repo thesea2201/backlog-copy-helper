@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Backlog Copy Helper",
+  "version": "1.0",
+  "description": "Copy issue key, title, and summary in markdown format",
+  "permissions": [
+    "activeTab",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "*://*.backlog.jp/*",
+    "*://backlog.jp/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.backlog.jp/*",
+        "*://backlog.jp/*"
+      ],
+      "js": ["src/content.js"],
+      "css": ["src/styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.svg",
+    "48": "icons/icon48.svg",
+    "128": "icons/icon128.svg"
+  }
+}
