@@ -112,6 +112,72 @@
     return button;
   }
 
+  // --- Notification copy feature ---
+  const NOTY_BUTTON_ID = 'backlog-utils-copy-noty-btn';
+
+  function findNotifications() {
+    const items = document.querySelectorAll('.notification-list__item');
+    const now = new Date();
+    const curMonth = now.getMonth();
+    const curYear = now.getFullYear();
+    const seen = new Set();
+    const lines = [];
+    items.forEach(item => {
+      const timeEl = item.querySelector('.js-notification-time');
+      if (!timeEl || !timeEl.title) return;
+      const date = new Date(timeEl.title);
+      if (date.getMonth() !== curMonth || date.getFullYear() !== curYear) return;
+      const idEl = item.querySelector('.Item-id');
+      const id = idEl ? idEl.textContent.trim() : '';
+      const titleEl = item.querySelector('.notification-list__title');
+      const title = titleEl ? titleEl.textContent.trim() : '';
+      const statusEl = item.querySelector('.status');
+      const status = statusEl ? statusEl.textContent.trim() : (item.classList.contains('is_read') ? 'Read' : 'Unread');
+      const key = id + '|' + title;
+      if (seen.has(key)) return;
+      seen.add(key);
+      lines.push(`${id}\t${title}\t${status}`);
+    });
+    return lines.join('\n');
+  }
+
+  async function handleCopyNotyClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const text = findNotifications();
+    if (!text) {
+      showNotification('No notifications for current month found', 'error');
+      return;
+    }
+    const success = await copyToClipboard(text);
+    if (success) {
+      showNotification('Copied notifications to clipboard!');
+    } else {
+      showNotification('Failed to copy notifications', 'error');
+    }
+  }
+
+  function createNotyButton() {
+    if (document.getElementById(NOTY_BUTTON_ID)) return document.getElementById(NOTY_BUTTON_ID);
+    const btn = document.createElement('button');
+    btn.id = NOTY_BUTTON_ID;
+    btn.className = 'backlog-utils-copy-noty-btn';
+    btn.title = 'Copy current month notifications (tab‑separated)';
+    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg> <span>Copy Noty</span>`;
+    btn.addEventListener('click', handleCopyNotyClick);
+    return btn;
+  }
+
+  function injectNotyButton() {
+    const notifLink = document.querySelector('.notifications-link');
+    if (!notifLink) return;
+    const parent = notifLink.parentElement;
+    if (!parent) return;
+    if (document.getElementById(NOTY_BUTTON_ID)) return;
+    const btn = createNotyButton();
+    parent.appendChild(btn);
+  }
+
   function injectButton() {
     const issueKeyEl = document.querySelector('[data-testid="issueKey"]');
     if (!issueKeyEl) return;
@@ -127,9 +193,11 @@
 
   function init() {
     injectButton();
+    injectNotyButton();
 
     const observer = new MutationObserver(() => {
       injectButton();
+      injectNotyButton();
     });
 
     observer.observe(document.body, {
@@ -138,6 +206,7 @@
     });
 
     setTimeout(injectButton, 1000);
+    setTimeout(injectNotyButton, 1000);
   }
 
   if (document.readyState === 'loading') {
