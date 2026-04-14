@@ -20,6 +20,9 @@ node_modules/
 dist/
 build/
 
+# Development/test content
+html-content/
+
 # Temporary files
 *.tmp
 *.temp

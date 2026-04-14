@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Backlog Utils",
-  "version": "1.0",
+  "version": "1.1.0",
   "description": "Utility toolkit for Backlog - copy issues, enhance workflow, and more",
   "permissions": [
     "activeTab",
