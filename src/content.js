@@ -115,46 +115,95 @@
   // --- Notification copy feature ---
   const NOTY_BUTTON_ID = 'backlog-utils-copy-noty-btn';
 
+  function openNotificationsPanel() {
+    const notifLink = document.querySelector('.globalNotificationsLink, .notifications-link, [data-testid="notificationsLink"]');
+    if (notifLink) {
+      notifLink.click();
+      return true;
+    }
+    return false;
+  }
+
+  function isNotificationsPanelOpen() {
+    const panel = document.querySelector('.slide-in--notifications, .notifications-panel, [data-testid="notificationsPanel"]');
+    return panel && panel.offsetParent !== null;
+  }
+
   function findNotifications() {
-    const items = document.querySelectorAll('.notification-list__item');
+    // Open panel if not already open
+    if (!isNotificationsPanelOpen()) {
+      openNotificationsPanel();
+    }
+
+    // Wait a bit for panel to render
+    const items = document.querySelectorAll('.notification-list__item, .notification-item');
     const now = new Date();
     const curMonth = now.getMonth();
     const curYear = now.getFullYear();
     const seen = new Set();
     const lines = [];
+
     items.forEach(item => {
-      const timeEl = item.querySelector('.js-notification-time');
+      // Get date from time element
+      const timeEl = item.querySelector('.js-notification-time, .notification-time');
       if (!timeEl || !timeEl.title) return;
       const date = new Date(timeEl.title);
       if (date.getMonth() !== curMonth || date.getFullYear() !== curYear) return;
-      const idEl = item.querySelector('.Item-id');
-      const id = idEl ? idEl.textContent.trim() : '';
-      const titleEl = item.querySelector('.notification-list__title');
-      const title = titleEl ? titleEl.textContent.trim() : '';
+
+      // Get issue key from .notification-list__summary .key
+      const summaryEl = item.querySelector('.notification-list__summary, .notification-summary');
+      const keyEl = summaryEl ? summaryEl.querySelector('.key') : null;
+      const key = keyEl ? keyEl.textContent.trim() : '';
+
+      // Get issue title from .notification-list__summary span (the text after key)
+      const spans = summaryEl ? summaryEl.querySelectorAll('span') : [];
+      let title = '';
+      for (const span of spans) {
+        if (!span.classList.contains('key')) {
+          title = span.textContent.trim();
+          break;
+        }
+      }
+
+      // Get status
       const statusEl = item.querySelector('.status');
-      const status = statusEl ? statusEl.textContent.trim() : (item.classList.contains('is_read') ? 'Read' : 'Unread');
-      const key = id + '|' + title;
-      if (seen.has(key)) return;
-      seen.add(key);
-      lines.push(`${id}\t${title}\t${status}`);
+      const status = statusEl ? statusEl.textContent.trim() : '';
+
+      // Deduplicate by key + title
+      const uniqueKey = key + '|' + title;
+      if (!key || seen.has(uniqueKey)) return;
+      seen.add(uniqueKey);
+
+      // Format: Key, Title, Status, Date
+      const dateStr = date.toISOString().split('T')[0];
+      lines.push(`${key}\t${title}\t${status}\t${dateStr}`);
     });
+
     return lines.join('\n');
   }
 
   async function handleCopyNotyClick(e) {
     e.preventDefault();
     e.stopPropagation();
-    const text = findNotifications();
-    if (!text) {
-      showNotification('No notifications for current month found', 'error');
-      return;
-    }
-    const success = await copyToClipboard(text);
-    if (success) {
-      showNotification('Copied notifications to clipboard!');
-    } else {
-      showNotification('Failed to copy notifications', 'error');
-    }
+
+    // Open panel and wait for it to render
+    openNotificationsPanel();
+    showNotification('Opening notifications panel...');
+
+    // Wait for panel to open and items to render
+    setTimeout(async () => {
+      const text = findNotifications();
+      if (!text) {
+        showNotification('No notifications for current month found', 'error');
+        return;
+      }
+      const success = await copyToClipboard(text);
+      if (success) {
+        showNotification('Copied notifications to clipboard!');
+      } else {
+        showNotification('Failed to copy notifications', 'error');
+      }
+    }, 800);
   }
 
   function createNotyButton() {
@@ -162,14 +211,15 @@
     const btn = document.createElement('button');
     btn.id = NOTY_BUTTON_ID;
     btn.className = 'backlog-utils-copy-noty-btn';
-    btn.title = 'Copy current month notifications (tab‑separated)';
+    btn.title = 'Copy notifications (Key, Title, Status, Date) - auto-opens panel';
     btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg> <span>Copy Noty</span>`;
     btn.addEventListener('click', handleCopyNotyClick);
     return btn;
   }
 
   function injectNotyButton() {
-    const notifLink = document.querySelector('.notifications-link');
+    // Look for the global notifications link in header
+    const notifLink = document.querySelector('.globalNotificationsLink, .notifications-link, [data-testid="notificationsLink"]');
     if (!notifLink) return;
     const parent = notifLink.parentElement;
     if (!parent) return;
