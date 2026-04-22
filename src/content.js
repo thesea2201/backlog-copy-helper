@@ -2,6 +2,21 @@
   'use strict';
 
   const COPY_BUTTON_ID = 'backlog-utils-copy-btn';
+  const TRANSLATE_BTN_CLASS = 'backlog-utils-translate-btn';
+  const TRANSLATED_BLOCK_CLASS = 'translated-block';
+
+  const LANG_NAMES = {
+    'en': 'English',
+    'ja': 'Japanese',
+    'vi': 'Vietnamese',
+    'es': 'Spanish',
+    'fr': 'French',
+    'de': 'German',
+    'zh': 'Chinese',
+    'ko': 'Korean',
+    'ru': 'Russian',
+    'pt': 'Portuguese'
+  };
 
   function findIssueKey() {
     const issueKeyEl = document.querySelector('[data-testid="issueKey"]');
@@ -241,13 +256,63 @@
     parent.appendChild(button);
   }
 
-  function init() {
-    injectButton();
-    injectNotyButton();
+  // Injection guard to prevent infinite loops from MutationObserver
+  let isInjecting = false;
 
-    const observer = new MutationObserver(() => {
+  function runInjection() {
+    if (isInjecting) return;
+    isInjecting = true;
+    try {
       injectButton();
       injectNotyButton();
+      injectTranslateButtons();
+    } finally {
+      isInjecting = false;
+    }
+  }
+
+  // Debounce helper to prevent performance issues during rapid DOM mutations
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  function init() {
+    // Initial injection
+    runInjection();
+
+    // Debounced injection for mutations - prevents freeze during page load
+    const debouncedInject = debounce(() => {
+      runInjection();
+    }, 250);
+
+    const observer = new MutationObserver((mutations) => {
+      // Only react to mutations that might add new content, not our own button insertions
+      const hasMeaningfulChanges = mutations.some(mutation => {
+        // Check if any added nodes are elements (not just our buttons)
+        for (const node of mutation.addedNodes) {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            // Ignore if it's our own button
+            if (node.classList?.contains(TRANSLATE_BTN_CLASS)) continue;
+            if (node.classList?.contains('backlog-utils-copy-btn')) continue;
+            if (node.id === COPY_BUTTON_ID) continue;
+            // Found a meaningful element addition
+            return true;
+          }
+        }
+        return false;
+      });
+
+      if (hasMeaningfulChanges) {
+        debouncedInject();
+      }
     });
 
     observer.observe(document.body, {
@@ -255,8 +320,294 @@
       subtree: true
     });
 
-    setTimeout(injectButton, 1000);
-    setTimeout(injectNotyButton, 1000);
+    // Also run after a delay to catch any missed elements
+    setTimeout(runInjection, 1000);
+  }
+
+  // --- Translation feature ---
+
+  function createTranslateButton() {
+    const button = document.createElement('button');
+    button.className = TRANSLATE_BTN_CLASS;
+    button.title = 'Translate this content (click) or force re-translate (Ctrl+click)';
+    button.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+      </svg>
+      <span>Translate</span>
+    `;
+    return button;
+  }
+
+  function createTranslateButtonWithDropdown(contentEl) {
+    const wrapper = document.createElement('span');
+    wrapper.className = 'backlog-utils-translate-wrapper';
+    // position: relative is crucial so the dropdown menu positions relative to this wrapper
+    wrapper.style.cssText = 'display: inline-flex; align-items: center; gap: 2px; position: relative; vertical-align: middle;';
+
+    const btn = createTranslateButton();
+    btn.addEventListener('click', (e) => {
+      if (e.ctrlKey || e.metaKey || e.shiftKey) {
+        // Force re-translate
+        handleTranslateClick(e, contentEl, true);
+      } else {
+        // Normal translate (uses cache)
+        handleTranslateClick(e, contentEl, false);
+      }
+    });
+
+    const dropdownBtn = document.createElement('button');
+    dropdownBtn.className = TRANSLATE_BTN_CLASS + ' dropdown';
+    dropdownBtn.title = 'More options';
+    dropdownBtn.style.cssText = 'padding: 2px 4px; margin-left: 0;';
+    dropdownBtn.innerHTML = `
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    `;
+
+    const menu = document.createElement('div');
+    menu.className = 'backlog-utils-translate-menu';
+    menu.style.cssText = `
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 1000;
+      min-width: 160px;
+      padding: 4px 0;
+    `;
+    menu.innerHTML = `
+      <div class="menu-item" data-action="force" style="padding: 8px 12px; cursor: pointer; font-size: 12px; color: #333; hover: background: #f5f5f5;">
+        🔄 Force re-translate
+      </div>
+      <div class="menu-item" data-action="gemini" style="padding: 8px 12px; cursor: pointer; font-size: 12px; color: #333; hover: background: #f5f5f5;">
+        ✨ Use Gemini only
+      </div>
+      <div class="menu-item" data-action="google" style="padding: 8px 12px; cursor: pointer; font-size: 12px; color: #333; hover: background: #f5f5f5;">
+        🔤 Use Google only
+      </div>
+    `;
+
+    // Hover styles via inline events since we can't add CSS easily
+    menu.querySelectorAll('.menu-item').forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        item.style.background = '#f5f5f5';
+      });
+      item.addEventListener('mouseleave', () => {
+        item.style.background = 'white';
+      });
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.style.display = 'none';
+        const action = item.dataset.action;
+        handleTranslateClick(e, contentEl, action === 'force', action === 'gemini' ? 'gemini' : action === 'google' ? 'google' : null);
+      });
+    });
+
+    dropdownBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const isVisible = menu.style.display === 'block';
+      // Close all other menus
+      document.querySelectorAll('.backlog-utils-translate-menu').forEach(m => m.style.display = 'none');
+      menu.style.display = isVisible ? 'none' : 'block';
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', () => {
+      menu.style.display = 'none';
+    });
+
+    wrapper.appendChild(btn);
+    wrapper.appendChild(dropdownBtn);
+    wrapper.appendChild(menu);
+
+    return { wrapper, btn };
+  }
+
+  function showTranslatedBlock(originalElement, translatedText, button, targetLang = 'en', source = 'google') {
+    // Check if already translated
+    const existingBlock = originalElement.parentElement.querySelector('.' + TRANSLATED_BLOCK_CLASS);
+    if (existingBlock) {
+      existingBlock.remove();
+      return;
+    }
+
+    const langName = LANG_NAMES[targetLang] || targetLang;
+    const isCached = source.includes('(cached)');
+    const baseSource = source.replace(' (cached)', '');
+    const sourceName = baseSource === 'gemini' ? 'Gemini' : 'Google Translate';
+    const cacheIndicator = isCached ? ' (cached)' : '';
+
+    const block = document.createElement('div');
+    block.className = TRANSLATED_BLOCK_CLASS;
+    if (isCached) {
+      block.classList.add('cached');
+    }
+    block.innerHTML = `
+      <div class="translated-content">${escapeHtml(translatedText).replace(/\n\n/g, '<br><br>')}</div>
+      <div class="translation-meta">
+        <span class="translation-source">Translated by ${sourceName}${cacheIndicator} to ${langName}</span>
+        <a href="#" class="remove-translation">Hide</a>
+      </div>
+    `;
+
+    // Insert after the original element's parent or the original element itself
+    const insertAfter = originalElement.closest('.comment-item__container, .ticket__article, .markdown-body') || originalElement;
+    insertAfter.insertAdjacentElement('afterend', block);
+
+    // Handle remove link
+    block.querySelector('.remove-translation').addEventListener('click', (e) => {
+      e.preventDefault();
+      block.remove();
+      button.classList.remove('active');
+    });
+
+    button.classList.add('active');
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  async function handleTranslateClick(e, targetElement, force = false, engine = null) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const button = e.currentTarget;
+
+    // Show loading state
+    button.disabled = true;
+    button.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg> <span>Translating...</span>`;
+
+    try {
+      // Debug: log what we're working with
+      console.log('Translate click - targetElement:', targetElement.tagName, targetElement.className);
+      console.log('Force re-translate:', force);
+      console.log('Engine preference:', engine);
+
+      const clone = targetElement.cloneNode(true);
+      // Remove all translation-related UI elements
+      clone.querySelectorAll('.' + TRANSLATE_BTN_CLASS).forEach(el => el.remove());
+      clone.querySelectorAll('.backlog-utils-translate-wrapper').forEach(el => el.remove());
+      clone.querySelectorAll('.backlog-utils-translate-menu').forEach(el => el.remove());
+
+      // innerText on detached nodes may not work, use textContent
+      const plainText = (clone.textContent || '').trim();
+      console.log('Extracted plainText length:', plainText.length);
+      console.log('Extracted plainText:', plainText.substring(0, 200));
+
+      if (!plainText || plainText.length < 2) {
+        showNotification('No text content found to translate', 'error');
+        return;
+      }
+
+      const response = await chrome.runtime.sendMessage({
+        action: 'translate',
+        text: plainText,
+        force,
+        engine
+      });
+
+      if (response.success) {
+        showTranslatedBlock(targetElement, response.text, button, response.targetLang, response.source);
+        showNotification(`Translated to ${LANG_NAMES[response.targetLang] || response.targetLang}`, 'success');
+      } else {
+        showNotification(response.error || 'Translation failed', 'error');
+      }
+    } catch (err) {
+      console.error('Translation error:', err);
+      showNotification('Translation failed: ' + err.message, 'error');
+    } finally {
+      // Restore button
+      button.disabled = false;
+      button.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span>Translate</span>
+      `;
+    }
+  }
+
+  function injectTranslateButtons() {
+    // Inject at top of comment items
+    const commentContainers = document.querySelectorAll('.comment-item__container.js_comment-container');
+    commentContainers.forEach(container => {
+      if (container.querySelector('.' + TRANSLATE_BTN_CLASS)) return;
+
+      const contentEl = container.querySelector('.comment-item__content, .markdown-body');
+      if (!contentEl) return;
+
+      const { wrapper, btn } = createTranslateButtonWithDropdown(contentEl);
+
+      // Insert at the top of the container
+      const header = container.querySelector('.comment-item__header, .comment-header');
+      if (header) {
+        header.style.position = 'relative';
+        header.appendChild(wrapper);
+      } else {
+        container.insertBefore(wrapper, container.firstChild);
+      }
+    });
+
+    // Inject at top of ticket articles
+    const ticketArticles = document.querySelectorAll('.ticket__article');
+    ticketArticles.forEach(article => {
+      if (article.querySelector('.' + TRANSLATE_BTN_CLASS)) return;
+
+      const contentEl = article.querySelector('.markdown-body, .article-content');
+      if (!contentEl) return;
+
+      const { wrapper, btn } = createTranslateButtonWithDropdown(contentEl);
+
+      // Insert at the top
+      const header = article.querySelector('.ticket__article-header, .article-header');
+      if (header) {
+        header.style.position = 'relative';
+        header.appendChild(wrapper);
+      } else {
+        article.insertBefore(wrapper, article.firstChild);
+      }
+    });
+
+    // Inject after issueDescription
+    const issueDesc = document.getElementById('issueDescription');
+    if (issueDesc) {
+      // Check if button already exists as next sibling (since we insert afterend)
+      const nextEl = issueDesc.nextElementSibling;
+      const hasButton = nextEl && (nextEl.classList?.contains(TRANSLATE_BTN_CLASS) || nextEl.querySelector('.' + TRANSLATE_BTN_CLASS));
+      if (!hasButton) {
+        const contentEl = issueDesc.querySelector('.markdown-body') || issueDesc;
+        const { wrapper, btn } = createTranslateButtonWithDropdown(contentEl);
+        issueDesc.insertAdjacentElement('afterend', wrapper);
+      }
+    }
+
+    // Inject for loom comment-content elements that have text
+    const loomContents = document.querySelectorAll('.loom.comment-content');
+    loomContents.forEach(contentEl => {
+      // Skip if already has translate button or no text
+      if (contentEl.querySelector('.' + TRANSLATE_BTN_CLASS)) return;
+      const textContent = contentEl.textContent?.trim();
+      if (!textContent || textContent.length < 2) return;
+
+      const { wrapper, btn } = createTranslateButtonWithDropdown(contentEl);
+
+      // Insert at the beginning of the content element
+      contentEl.insertBefore(wrapper, contentEl.firstChild);
+    });
   }
 
   if (document.readyState === 'loading') {
