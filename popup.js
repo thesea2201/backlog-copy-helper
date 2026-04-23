@@ -4,18 +4,27 @@
   const DEFAULT_LANG = 'en';
   const STORAGE_KEY = 'backlogUtilsTargetLang';
   const CACHE_DURATION_KEY = 'backlogUtilsCacheDuration';
+  const CUSTOM_PROMPT_KEY = 'backlogUtilsCustomPrompt';
   const DEFAULT_CACHE_DAYS = -1; // -1 = never cache (default)
   const CACHE_PREFIX = 'translation_cache_';
+  
+  // Default prompt for technical translation (preserves engineering terminology)
+  const DEFAULT_CUSTOM_PROMPT = `Translate the following text to {lang}. 
+- Keep technical terms, programming concepts, and engineering vocabulary in English
+- Use professional, formal tone
+- Only return the translation, no explanations, no apologies, no comments`;
 
   async function loadSettings() {
   // After settings are loaded we also render the list of cached translations
   renderCacheList();
     try {
-      const result = await chrome.storage.sync.get([STORAGE_KEY, CACHE_DURATION_KEY]);
+      const result = await chrome.storage.sync.get([STORAGE_KEY, CACHE_DURATION_KEY, CUSTOM_PROMPT_KEY]);
       const lang = result[STORAGE_KEY] || DEFAULT_LANG;
       const cacheDays = result[CACHE_DURATION_KEY] ?? DEFAULT_CACHE_DAYS;
+      const customPrompt = result[CUSTOM_PROMPT_KEY] || DEFAULT_CUSTOM_PROMPT;
       document.getElementById('targetLang').value = lang;
       document.getElementById('cacheDuration').value = String(cacheDays);
+      document.getElementById('customPrompt').value = customPrompt;
       updateCacheStats();
     } catch (err) {
       console.error('Failed to load settings:', err);
@@ -39,6 +48,16 @@
       updateCacheStats(); // Refresh stats display
     } catch (err) {
       console.error('Failed to save cache duration:', err);
+      showStatus('Error saving', true);
+    }
+  }
+
+  async function saveCustomPrompt(prompt) {
+    try {
+      await chrome.storage.sync.set({ [CUSTOM_PROMPT_KEY]: prompt });
+      showStatus('Custom prompt saved!');
+    } catch (err) {
+      console.error('Failed to save custom prompt:', err);
       showStatus('Error saving', true);
     }
   }
@@ -135,10 +154,6 @@
     }
   }
 
-      showStatus('Error clearing cache', true);
-    }
-  }
-
   async function resetGeminiChat() {
     if (!confirm('Reset Gemini chat session?\n\nThis will start a fresh chat next time you translate. The old chat history will remain in Gemini but won\'t be used.')) {
       return;
@@ -181,6 +196,11 @@
 
     document.getElementById('resetGeminiChatBtn').addEventListener('click', () => {
       resetGeminiChat();
+    });
+
+    document.getElementById('savePromptBtn').addEventListener('click', () => {
+      const prompt = document.getElementById('customPrompt').value;
+      saveCustomPrompt(prompt);
     });
   }
 

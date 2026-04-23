@@ -486,7 +486,13 @@
       throw new Error('No text content provided for translation');
     }
 
-    const prompt = `Translate the following text to ${langName}. Only return the translation, no explanations:\n\n${text}`;
+    // Load custom prompt from storage or use default
+    const customPromptResult = await chrome.storage.sync.get(['backlogUtilsCustomPrompt']);
+    const defaultPrompt = `Translate the following text to ${langName}. Only return the translation, no explanations:`;
+    const customPromptTemplate = customPromptResult.backlogUtilsCustomPrompt || defaultPrompt;
+    // Replace {lang} placeholder with actual language name
+    const promptPrefix = customPromptTemplate.replace(/{lang}/g, langName);
+    const prompt = `${promptPrefix}\n\n${text}`;
     console.log('Gemini prompt length:', prompt.length, 'Text length:', text.length);
     console.log('Full prompt being sent to Gemini:', prompt);
 
