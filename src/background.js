@@ -528,8 +528,9 @@
         throw new Error(sendResult.error || 'Failed to send prompt');
       }
 
-      // Reduced wait - start checking for response immediately
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // Wait for Gemini to process and update URL with new chat session ID
+      // Need sufficient time for URL to update before extracting chat ID
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Extract and save chat ID if it's a new session
       const chatId = await extractChatIdFromTab(tabId);
