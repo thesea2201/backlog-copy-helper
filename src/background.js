@@ -261,8 +261,8 @@
 
     // Wait for the page to fully load
     await waitForTabLoad(geminiTabId);
-    // Extra settle time for Angular to boot
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    // Reduced settle time - Gemini loads quickly on cached connections
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     return geminiTabId;
   }
@@ -328,7 +328,7 @@
         }
 
         // Wait for Angular to sync
-        await new Promise(r => setTimeout(r, 300));
+        await new Promise(r => setTimeout(r, 150));
 
         // Verify content was set
         const finalText = (inputEl.innerText || inputEl.textContent || '').trim();
@@ -342,10 +342,10 @@
           inputEl.innerHTML = '';
           document.execCommand('insertText', false, userPrompt);
           inputEl.dispatchEvent(new InputEvent('input', { bubbles: true }));
-          await new Promise(r => setTimeout(r, 200));
+          await new Promise(r => setTimeout(r, 100));
         }
 
-        // Wait then find and click send button
+        // Wait briefly then find and click send button
         return new Promise((resolve) => {
           setTimeout(() => {
             // Find send button
@@ -398,7 +398,7 @@
             console.log('Clicking send button');
             sendBtn.click();
             resolve({ success: true });
-          }, 800);
+          }, 100);
         });
       },
       args: [prompt]
@@ -408,11 +408,12 @@
   }
 
   async function waitForGeminiResponse(tabId, timeoutMs = GEMINI_TIMEOUT_MS) {
-    // Wait a moment for Gemini to start generating
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    // Reduced initial wait - start checking earlier
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const startTime = Date.now();
-    const checkInterval = 2000;
+    // Poll more frequently for faster response detection
+    const checkInterval = 500;
 
     while (Date.now() - startTime < timeoutMs) {
       await new Promise((resolve) => setTimeout(resolve, checkInterval));
@@ -521,8 +522,8 @@
         throw new Error(sendResult.error || 'Failed to send prompt');
       }
 
-      // Wait longer for Gemini to process and update URL
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      // Reduced wait - start checking for response immediately
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Extract and save chat ID if it's a new session
       const chatId = await extractChatIdFromTab(tabId);
