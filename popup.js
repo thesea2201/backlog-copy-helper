@@ -129,15 +129,14 @@
         if (days !== -1 && ageDays > days) return; // respect cache duration setting
         const itemDiv = document.createElement('div');
         itemDiv.className = 'cached-item';
-        itemDiv.style = 'border:1px solid #ddd;padding:6px;margin:4px 0;background:#fafafa;position:relative;';
         const src = value.sourceText || '';
         const trans = value.translatedText || '';
         const lang = value.targetLang || '';
         itemDiv.innerHTML = `
-          <div><strong>Lang:</strong> ${lang}</div>
-          <div><strong>Source:</strong> ${src}</div>
-          <div><strong>Translated:</strong> ${trans}</div>
-          <a href="#" style="position:absolute;top:4px;right:4px;color:#c00;" data-key="${key}">✕</a>
+          <a href="#" data-key="${key}">✕</a>
+          <strong>Lang:</strong> ${lang}<br>
+          <strong>Source:</strong> ${src}<br>
+          <strong>Translated:</strong> ${trans}
         `;
         container.appendChild(itemDiv);
         itemDiv.querySelector('a').addEventListener('click', (e) => {
@@ -173,14 +172,33 @@
   function showStatus(message, isError = false) {
     const statusEl = document.getElementById('status');
     statusEl.textContent = message;
-    statusEl.style.color = isError ? '#ef4444' : '#10b981';
+    statusEl.className = 'status' + (isError ? ' error' : '');
+    statusEl.classList.add('show');
     setTimeout(() => {
-      statusEl.textContent = '';
+      statusEl.classList.remove('show');
     }, 2000);
+  }
+
+  function initTabs() {
+    const tabs = document.querySelectorAll('.tab');
+    const contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetId = tab.dataset.tab;
+
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+
+        tab.classList.add('active');
+        document.getElementById(`tab-${targetId}`).classList.add('active');
+      });
+    });
   }
 
   function init() {
     loadSettings();
+    initTabs();
 
     document.getElementById('targetLang').addEventListener('change', (e) => {
       saveSettings(e.target.value);
