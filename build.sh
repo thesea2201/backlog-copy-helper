@@ -24,8 +24,7 @@ echo "=========================================="
 echo "Building ${EXTENSION_NAME} v${VERSION}"
 echo "=========================================="
 
-# Clean and create build directory
-rm -rf "$BUILD_DIR"
+# Create build directory if not exists (preserve old versions)
 mkdir -p "$BUILD_DIR"
 
 # Create temporary staging directory
