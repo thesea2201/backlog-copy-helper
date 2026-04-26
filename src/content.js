@@ -638,6 +638,9 @@
       const hasButton = nextEl && (nextEl.classList?.contains(TRANSLATE_BTN_CLASS) || nextEl.querySelector('.' + TRANSLATE_BTN_CLASS));
       if (!hasButton) {
         const contentEl = issueDesc.querySelector('.markdown-body') || issueDesc;
+        // Skip if no actual text content to translate
+        const textContent = contentEl.textContent?.trim();
+        if (!textContent || textContent.length < 2) return;
         const { wrapper, btn } = createTranslateButtonWithDropdown(contentEl);
         issueDesc.insertAdjacentElement('afterend', wrapper);
       }
