@@ -1,0 +1,326 @@
+{
+  "extensionName": {
+    "message": "Backlog Utils",
+    "description": "Name of the extension"
+  },
+  "extensionDescription": {
+    "message": "Utility toolkit for Backlog - copy issues, translate content, enhance workflow, and more",
+    "description": "Description of the extension"
+  },
+  "popupTitle": {
+    "message": "Backlog Utils",
+    "description": "Title shown in popup header"
+  },
+  "popupSubtitle": {
+    "message": "Translation & Customization",
+    "description": "Subtitle shown in popup header"
+  },
+  "tabMain": {
+    "message": "Main",
+    "description": "Main tab label"
+  },
+  "tabSettings": {
+    "message": "Settings",
+    "description": "Settings tab label"
+  },
+  "targetLanguageLabel": {
+    "message": "Target Language",
+    "description": "Label for target language selection"
+  },
+  "cacheSettingsTitle": {
+    "message": "Cache Settings",
+    "description": "Title for cache settings section"
+  },
+  "cacheDurationLabel": {
+    "message": "Keep Translations For",
+    "description": "Label for cache duration selection"
+  },
+  "cacheOptionNever": {
+    "message": "Never (no cache)",
+    "description": "Cache duration option - never"
+  },
+  "cacheOption7Days": {
+    "message": "7 days",
+    "description": "Cache duration option - 7 days"
+  },
+  "cacheOption1Month": {
+    "message": "1 month",
+    "description": "Cache duration option - 1 month"
+  },
+  "cacheOptionForever": {
+    "message": "Forever",
+    "description": "Cache duration option - forever"
+  },
+  "noCachedTranslations": {
+    "message": "No cached translations",
+    "description": "Shown when no translations are cached"
+  },
+  "cachingDisabled": {
+    "message": "Caching disabled",
+    "description": "Shown when caching is disabled"
+  },
+  "cachedTranslationsCount": {
+    "message": "$count$ translation$plural$ cached",
+    "description": "Shows number of cached translations",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "5"
+      },
+      "plural": {
+        "content": "$2",
+        "example": "s"
+      }
+    }
+  },
+  "clearCacheButton": {
+    "message": "Clear All Cache",
+    "description": "Button to clear all cached translations"
+  },
+  "customPromptLabel": {
+    "message": "Custom Translation Prompt",
+    "description": "Label for custom prompt textarea"
+  },
+  "customPromptHint": {
+    "message": "Use {lang} as placeholder for target language. Leave empty to use default prompt.",
+    "description": "Hint text for custom prompt"
+  },
+  "savePromptButton": {
+    "message": "Save Prompt",
+    "description": "Button to save custom prompt"
+  },
+  "advancedTitle": {
+    "message": "Advanced",
+    "description": "Title for advanced settings section"
+  },
+  "resetGeminiButton": {
+    "message": "Reset Gemini Chat Session",
+    "description": "Button to reset Gemini chat session"
+  },
+  "rateLimitInfo": {
+    "message": "Rate Limit: Max 5 translations per minute",
+    "description": "Rate limit information in footer"
+  },
+  "engineInfo": {
+    "message": "Engine: Google Translate API (with Gemini experimental fallback)",
+    "description": "Translation engine information in footer"
+  },
+  "statusSaved": {
+    "message": "Saved!",
+    "description": "Success message when settings are saved"
+  },
+  "statusCacheSaved": {
+    "message": "Cache setting saved!",
+    "description": "Success message when cache setting is saved"
+  },
+  "statusPromptSaved": {
+    "message": "Custom prompt saved!",
+    "description": "Success message when custom prompt is saved"
+  },
+  "statusError": {
+    "message": "Error saving",
+    "description": "Error message when saving fails"
+  },
+  "confirmClearCache": {
+    "message": "Are you sure you want to clear all cached translations?\n\nThis cannot be undone.",
+    "description": "Confirmation dialog for clearing cache"
+  },
+  "statusNoCacheToClear": {
+    "message": "No cache to clear",
+    "description": "Message when there's no cache to clear"
+  },
+  "statusCacheCleared": {
+    "message": "Cleared $count$ cached translation$plural$!",
+    "description": "Message when cache is cleared",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "5"
+      },
+      "plural": {
+        "content": "$2",
+        "example": "s"
+      }
+    }
+  },
+  "confirmResetGemini": {
+    "message": "Reset Gemini chat session?\n\nThis will start a fresh chat next time you translate. The old chat history will remain in Gemini but won't be used.",
+    "description": "Confirmation dialog for resetting Gemini chat"
+  },
+  "statusGeminiReset": {
+    "message": "Gemini chat reset! Fresh chat will start next translation.",
+    "description": "Message when Gemini chat is reset"
+  },
+  "statusResetError": {
+    "message": "Error resetting chat",
+    "description": "Error message when resetting Gemini chat fails"
+  },
+  "langEnglish": {
+    "message": "English",
+    "description": "Language name - English"
+  },
+  "langJapanese": {
+    "message": "Japanese",
+    "description": "Language name - Japanese"
+  },
+  "langVietnamese": {
+    "message": "Vietnamese",
+    "description": "Language name - Vietnamese"
+  },
+  "langSpanish": {
+    "message": "Spanish",
+    "description": "Language name - Spanish"
+  },
+  "langFrench": {
+    "message": "French",
+    "description": "Language name - French"
+  },
+  "langGerman": {
+    "message": "German",
+    "description": "Language name - German"
+  },
+  "langChinese": {
+    "message": "Chinese (Simplified)",
+    "description": "Language name - Chinese"
+  },
+  "langKorean": {
+    "message": "Korean",
+    "description": "Language name - Korean"
+  },
+  "langRussian": {
+    "message": "Russian",
+    "description": "Language name - Russian"
+  },
+  "langPortuguese": {
+    "message": "Portuguese",
+    "description": "Language name - Portuguese"
+  },
+  "copyButtonTitle": {
+    "message": "Copy issue key, title & summary (markdown)",
+    "description": "Tooltip for copy button"
+  },
+  "copyButtonText": {
+    "message": "Copy MD",
+    "description": "Text on copy button"
+  },
+  "copyNotyButtonTitle": {
+    "message": "Copy notifications (Key, Title, Status, Date) - auto-opens panel",
+    "description": "Tooltip for copy notifications button"
+  },
+  "copyNotyButtonText": {
+    "message": "Copy Noty",
+    "description": "Text on copy notifications button"
+  },
+  "notificationCopied": {
+    "message": "Copied to clipboard!",
+    "description": "Success notification after copying"
+  },
+  "notificationCopyFailed": {
+    "message": "Failed to copy",
+    "description": "Error notification when copy fails"
+  },
+  "notificationNoIssueInfo": {
+    "message": "Could not find issue information",
+    "description": "Error when no issue info found"
+  },
+  "notificationOpeningNoty": {
+    "message": "Opening notifications panel...",
+    "description": "Notification when opening panel"
+  },
+  "notificationNoNotyFound": {
+    "message": "No notifications for current month found",
+    "description": "Error when no notifications found"
+  },
+  "notificationNotyCopied": {
+    "message": "Copied notifications to clipboard!",
+    "description": "Success after copying notifications"
+  },
+  "notificationNotyCopyFailed": {
+    "message": "Failed to copy notifications",
+    "description": "Error when copying notifications fails"
+  },
+  "translateButtonTitle": {
+    "message": "Translate this content (click) or force re-translate (Ctrl+click)",
+    "description": "Tooltip for translate button"
+  },
+  "translateButtonText": {
+    "message": "Translate",
+    "description": "Text on translate button"
+  },
+  "translatingText": {
+    "message": "Translating...",
+    "description": "Text shown while translating"
+  },
+  "dropdownMoreOptions": {
+    "message": "More options",
+    "description": "Tooltip for dropdown button"
+  },
+  "menuForceRetranslate": {
+    "message": "Force re-translate",
+    "description": "Menu item to force re-translate"
+  },
+  "menuUseGemini": {
+    "message": "Use Gemini only",
+    "description": "Menu item to use Gemini only"
+  },
+  "menuUseGoogle": {
+    "message": "Use Google only",
+    "description": "Menu item to use Google only"
+  },
+  "translationMetaTranslatedBy": {
+    "message": "Translated by $source$ to $lang$",
+    "description": "Translation attribution",
+    "placeholders": {
+      "source": {
+        "content": "$1",
+        "example": "Google Translate"
+      },
+      "lang": {
+        "content": "$2",
+        "example": "English"
+      }
+    }
+  },
+  "translationMetaCached": {
+    "message": " (cached)",
+    "description": "Indicator that translation was cached"
+  },
+  "translationHideLink": {
+    "message": "Hide",
+    "description": "Link to hide translated block"
+  },
+  "notificationTranslatedTo": {
+    "message": "Translated to $lang$",
+    "description": "Success notification with target language",
+    "placeholders": {
+      "lang": {
+        "content": "$1",
+        "example": "English"
+      }
+    }
+  },
+  "notificationTranslationFailed": {
+    "message": "Translation failed",
+    "description": "Error when translation fails"
+  },
+  "notificationNoTextToTranslate": {
+    "message": "No text content found to translate",
+    "description": "Error when no text found"
+  },
+  "sourceGoogle": {
+    "message": "Google Translate",
+    "description": "Translation source name - Google"
+  },
+  "sourceGemini": {
+    "message": "Gemini",
+    "description": "Translation source name - Gemini"
+  },
+  "issueTitleLabel": {
+    "message": "Title:",
+    "description": "Label for issue title in copied markdown"
+  },
+  "issueSummaryLabel": {
+    "message": "Summary:",
+    "description": "Label for issue summary in copied markdown"
+  }
+}

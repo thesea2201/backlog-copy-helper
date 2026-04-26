@@ -231,66 +231,66 @@
 </head>
 <body>
   <div class="header">
-    <h3>Backlog Utils</h3>
-    <p>Translation & Customization</p>
+    <h3 data-i18n="popupTitle">Backlog Utils</h3>
+    <p data-i18n="popupSubtitle">Translation & Customization</p>
   </div>
 
   <div class="tabs">
-    <button class="tab active" data-tab="main">Main</button>
-    <button class="tab" data-tab="settings">Settings</button>
+    <button class="tab active" data-tab="main" data-i18n="tabMain">Main</button>
+    <button class="tab" data-tab="settings" data-i18n="tabSettings">Settings</button>
   </div>
 
   <div class="tab-content active" id="tab-main">
     <div class="form-group">
-      <label for="targetLang">Target Language</label>
+      <label for="targetLang" data-i18n="targetLanguageLabel">Target Language</label>
       <select id="targetLang">
-        <option value="en">English</option>
-        <option value="ja">Japanese</option>
-        <option value="vi">Vietnamese</option>
-        <option value="es">Spanish</option>
-        <option value="fr">French</option>
-        <option value="de">German</option>
-        <option value="zh">Chinese (Simplified)</option>
-        <option value="ko">Korean</option>
-        <option value="ru">Russian</option>
-        <option value="pt">Portuguese</option>
+        <option value="en" data-i18n="langEnglish">English</option>
+        <option value="ja" data-i18n="langJapanese">Japanese</option>
+        <option value="vi" data-i18n="langVietnamese">Vietnamese</option>
+        <option value="es" data-i18n="langSpanish">Spanish</option>
+        <option value="fr" data-i18n="langFrench">French</option>
+        <option value="de" data-i18n="langGerman">German</option>
+        <option value="zh" data-i18n="langChinese">Chinese (Simplified)</option>
+        <option value="ko" data-i18n="langKorean">Korean</option>
+        <option value="ru" data-i18n="langRussian">Russian</option>
+        <option value="pt" data-i18n="langPortuguese">Portuguese</option>
       </select>
     </div>
 
     <div class="section">
-      <h4 class="section-title">Cache Settings</h4>
+      <h4 class="section-title" data-i18n="cacheSettingsTitle">Cache Settings</h4>
       <div class="form-group">
-        <label for="cacheDuration">Keep Translations For</label>
+        <label for="cacheDuration" data-i18n="cacheDurationLabel">Keep Translations For</label>
         <select id="cacheDuration">
-          <option value="-1">Never (no cache)</option>
-          <option value="7">7 days</option>
-          <option value="30">1 month</option>
-          <option value="0">Forever</option>
+          <option value="-1" data-i18n="cacheOptionNever">Never (no cache)</option>
+          <option value="7" data-i18n="cacheOption7Days">7 days</option>
+          <option value="30" data-i18n="cacheOption1Month">1 month</option>
+          <option value="0" data-i18n="cacheOptionForever">Forever</option>
         </select>
       </div>
-      <div class="cache-stats" id="cacheStats">No cached translations</div>
+      <div class="cache-stats" id="cacheStats" data-i18n="noCachedTranslations">No cached translations</div>
       <div class="cached-list" id="cachedList"></div>
-      <button class="btn btn-danger" id="clearCacheBtn">Clear All Cache</button>
+      <button class="btn btn-danger" id="clearCacheBtn" data-i18n="clearCacheButton">Clear All Cache</button>
     </div>
   </div>
 
   <div class="tab-content" id="tab-settings">
     <div class="form-group">
-      <label for="customPrompt">Custom Translation Prompt</label>
+      <label for="customPrompt" data-i18n="customPromptLabel">Custom Translation Prompt</label>
       <textarea id="customPrompt" rows="5" placeholder="Enter your custom translation instructions..."></textarea>
-      <p class="hint">Use <code>{lang}</code> as placeholder for target language. Leave empty to use default prompt.</p>
+      <p class="hint" data-i18n="customPromptHint">Use <code>{lang}</code> as placeholder for target language. Leave empty to use default prompt.</p>
     </div>
-    <button class="btn btn-primary" id="savePromptBtn">Save Prompt</button>
+    <button class="btn btn-primary" id="savePromptBtn" data-i18n="savePromptButton">Save Prompt</button>
 
     <div class="section">
-      <h4 class="section-title">Advanced</h4>
-      <button class="btn btn-warning" id="resetGeminiChatBtn">Reset Gemini Chat Session</button>
+      <h4 class="section-title" data-i18n="advancedTitle">Advanced</h4>
+      <button class="btn btn-warning" id="resetGeminiChatBtn" data-i18n="resetGeminiButton">Reset Gemini Chat Session</button>
     </div>
   </div>
 
   <div class="footer">
-    <strong>Rate Limit:</strong> Max 5 translations per minute<br>
-    <strong>Engine:</strong> Google Translate API (with Gemini experimental fallback)
+    <strong>Rate Limit:</strong> <span data-i18n="rateLimitInfo">Max 5 translations per minute</span><br>
+    <strong>Engine:</strong> <span data-i18n="engineInfo">Google Translate API (with Gemini experimental fallback)</span>
   </div>
 
   <div class="status" id="status"></div>

@@ -635,6 +635,13 @@
 
   // Handle messages from content script
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // Handle i18n message requests
+    if (message.action === 'i18n') {
+      const result = chrome.i18n.getMessage(message.key, message.substitutions);
+      sendResponse({ message: result });
+      return false;
+    }
+
     if (message.action !== 'translate') return false;
 
     // Check rate limit

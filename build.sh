@@ -36,8 +36,11 @@ trap "rm -rf $STAGING_DIR" EXIT
 echo "Copying files..."
 cp manifest.json "$STAGING_DIR/"
 cp README.md "$STAGING_DIR/"
+cp popup.html "$STAGING_DIR/"
+cp popup.js "$STAGING_DIR/"
 cp -r src "$STAGING_DIR/"
 cp -r icons "$STAGING_DIR/"
+cp -r _locales "$STAGING_DIR/"
 
 # Create zip file
 echo "Creating zip: ${OUTPUT_NAME}"

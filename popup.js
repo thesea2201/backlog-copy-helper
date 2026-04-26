@@ -7,9 +7,32 @@
   const CUSTOM_PROMPT_KEY = 'backlogUtilsCustomPrompt';
   const DEFAULT_CACHE_DAYS = -1; // -1 = never cache (default)
   const CACHE_PREFIX = 'translation_cache_';
-  
+
+  // Helper to get i18n message
+  function i18n(messageName, substitutions) {
+    return chrome.i18n.getMessage(messageName, substitutions);
+  }
+
+  // Translate all elements with data-i18n attribute
+  function translateUI() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      const translation = i18n(key);
+      if (translation) {
+        // For input elements, update value or placeholder
+        if (el.tagName === 'INPUT' && el.type === 'submit') {
+          el.value = translation;
+        } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+          el.placeholder = translation;
+        } else {
+          el.textContent = translation;
+        }
+      }
+    });
+  }
+
   // Default prompt for technical translation (preserves engineering terminology)
-  const DEFAULT_CUSTOM_PROMPT = `Translate the following text to {lang}. 
+  const DEFAULT_CUSTOM_PROMPT = `Translate the following text to {lang}.
 - Keep technical terms, programming concepts, and engineering vocabulary in English
 - Use professional, formal tone
 - Only return the translation, no explanations, no apologies, no comments`;
@@ -34,31 +57,31 @@
   async function saveSettings(lang) {
     try {
       await chrome.storage.sync.set({ [STORAGE_KEY]: lang });
-      showStatus('Saved!');
+      showStatus(i18n('statusSaved'));
     } catch (err) {
       console.error('Failed to save settings:', err);
-      showStatus('Error saving', true);
+      showStatus(i18n('statusError'), true);
     }
   }
 
   async function saveCacheDuration(days) {
     try {
       await chrome.storage.sync.set({ [CACHE_DURATION_KEY]: parseInt(days, 10) });
-      showStatus('Cache setting saved!');
+      showStatus(i18n('statusCacheSaved'));
       updateCacheStats(); // Refresh stats display
     } catch (err) {
       console.error('Failed to save cache duration:', err);
-      showStatus('Error saving', true);
+      showStatus(i18n('statusError'), true);
     }
   }
 
   async function saveCustomPrompt(prompt) {
     try {
       await chrome.storage.sync.set({ [CUSTOM_PROMPT_KEY]: prompt });
-      showStatus('Custom prompt saved!');
+      showStatus(i18n('statusPromptSaved'));
     } catch (err) {
       console.error('Failed to save custom prompt:', err);
-      showStatus('Error saving', true);
+      showStatus(i18n('statusError'), true);
     }
   }
 
@@ -72,7 +95,7 @@
       const statsEl = document.getElementById('cacheStats');
 
       if (days === -1) {
-        statsEl.textContent = 'Caching disabled';
+        statsEl.textContent = i18n('cachingDisabled');
         return;
       }
 
@@ -80,9 +103,10 @@
       const cacheKeys = Object.keys(all).filter(k => k.startsWith(CACHE_PREFIX));
       const count = cacheKeys.length;
       if (count === 0) {
-        statsEl.textContent = 'No cached translations';
+        statsEl.textContent = i18n('noCachedTranslations');
       } else {
-        statsEl.textContent = `${count} translation${count > 1 ? 's' : ''} cached`;
+        const plural = count > 1 ? 's' : '';
+        statsEl.textContent = i18n('cachedTranslationsCount', [String(count), plural]);
       }
     } catch (err) {
       console.error('Failed to update cache stats:', err);
@@ -90,7 +114,7 @@
   }
 
   async function clearAllCache() {
-    if (!confirm('Are you sure you want to clear all cached translations?\n\nThis cannot be undone.')) {
+    if (!confirm(i18n('confirmClearCache'))) {
       return;
     }
 
@@ -98,11 +122,12 @@
       const all = await chrome.storage.local.get(null);
       const cacheKeys = Object.keys(all).filter(k => k.startsWith(CACHE_PREFIX));
       if (cacheKeys.length === 0) {
-        showStatus('No cache to clear');
+        showStatus(i18n('statusNoCacheToClear'));
         return;
       }
       await chrome.storage.local.remove(cacheKeys);
-      showStatus(`Cleared ${cacheKeys.length} cached translation${cacheKeys.length > 1 ? 's' : ''}!`);
+      const plural = cacheKeys.length > 1 ? 's' : '';
+      showStatus(i18n('statusCacheCleared', [String(cacheKeys.length), plural]));
       updateCacheStats();
     } catch (err) {
       console.error('Failed to clear cache:', err);
@@ -118,7 +143,7 @@
       const all = await chrome.storage.local.get(null);
       const cacheItems = Object.entries(all).filter(([k]) => k.startsWith(CACHE_PREFIX));
       if (cacheItems.length === 0) {
-        container.textContent = 'No cached translations';
+        container.textContent = i18n('noCachedTranslations');
         return;
       }
       const result = await chrome.storage.sync.get([CACHE_DURATION_KEY]);
@@ -154,18 +179,18 @@
   }
 
   async function resetGeminiChat() {
-    if (!confirm('Reset Gemini chat session?\n\nThis will start a fresh chat next time you translate. The old chat history will remain in Gemini but won\'t be used.')) {
+    if (!confirm(i18n('confirmResetGemini'))) {
       return;
     }
 
     try {
       const GEMINI_CHAT_KEY = 'backlogUtilsGeminiChatId';
       await chrome.storage.local.remove(GEMINI_CHAT_KEY);
-      showStatus('Gemini chat reset! Fresh chat will start next translation.');
+      showStatus(i18n('statusGeminiReset'));
       console.log('Cleared Gemini chat ID');
     } catch (err) {
       console.error('Failed to reset Gemini chat:', err);
-      showStatus('Error resetting chat', true);
+      showStatus(i18n('statusResetError'), true);
     }
   }
 
@@ -197,6 +222,7 @@
   }
 
   function init() {
+    translateUI(); // Apply i18n translations first
     loadSettings();
     initTabs();
 

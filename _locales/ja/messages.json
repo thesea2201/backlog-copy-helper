@@ -1,0 +1,326 @@
+{
+  "extensionName": {
+    "message": "Backlog Utils",
+    "description": "Name of the extension"
+  },
+  "extensionDescription": {
+    "message": "Backlogのためのユーティリティツールキット - 課題のコピー、コンテンツの翻訳、ワークフローの強化など",
+    "description": "Description of the extension"
+  },
+  "popupTitle": {
+    "message": "Backlog Utils",
+    "description": "Title shown in popup header"
+  },
+  "popupSubtitle": {
+    "message": "翻訳とカスタマイズ",
+    "description": "Subtitle shown in popup header"
+  },
+  "tabMain": {
+    "message": "メイン",
+    "description": "Main tab label"
+  },
+  "tabSettings": {
+    "message": "設定",
+    "description": "Settings tab label"
+  },
+  "targetLanguageLabel": {
+    "message": "ターゲット言語",
+    "description": "Label for target language selection"
+  },
+  "cacheSettingsTitle": {
+    "message": "キャッシュ設定",
+    "description": "Title for cache settings section"
+  },
+  "cacheDurationLabel": {
+    "message": "翻訳の保存期間",
+    "description": "Label for cache duration selection"
+  },
+  "cacheOptionNever": {
+    "message": "保存しない（キャッシュ無効）",
+    "description": "Cache duration option - never"
+  },
+  "cacheOption7Days": {
+    "message": "7日間",
+    "description": "Cache duration option - 7 days"
+  },
+  "cacheOption1Month": {
+    "message": "1ヶ月",
+    "description": "Cache duration option - 1 month"
+  },
+  "cacheOptionForever": {
+    "message": "無期限",
+    "description": "Cache duration option - forever"
+  },
+  "noCachedTranslations": {
+    "message": "キャッシュされた翻訳はありません",
+    "description": "Shown when no translations are cached"
+  },
+  "cachingDisabled": {
+    "message": "キャッシュは無効です",
+    "description": "Shown when caching is disabled"
+  },
+  "cachedTranslationsCount": {
+    "message": "$count$件の翻訳がキャッシュされています",
+    "description": "Shows number of cached translations",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "5"
+      },
+      "plural": {
+        "content": "$2",
+        "example": ""
+      }
+    }
+  },
+  "clearCacheButton": {
+    "message": "すべてのキャッシュを削除",
+    "description": "Button to clear all cached translations"
+  },
+  "customPromptLabel": {
+    "message": "カスタム翻訳プロンプト",
+    "description": "Label for custom prompt textarea"
+  },
+  "customPromptHint": {
+    "message": "ターゲット言語のプレースホルダーとして {lang} を使用します。空のままにするとデフォルトのプロンプトが使用されます。",
+    "description": "Hint text for custom prompt"
+  },
+  "savePromptButton": {
+    "message": "プロンプトを保存",
+    "description": "Button to save custom prompt"
+  },
+  "advancedTitle": {
+    "message": "詳細設定",
+    "description": "Title for advanced settings section"
+  },
+  "resetGeminiButton": {
+    "message": "Gemini チャットセッションをリセット",
+    "description": "Button to reset Gemini chat session"
+  },
+  "rateLimitInfo": {
+    "message": "レート制限: 1分あたり最大5回の翻訳",
+    "description": "Rate limit information in footer"
+  },
+  "engineInfo": {
+    "message": "エンジン: Google Translate API（Gemini 実験的フォールバック付き）",
+    "description": "Translation engine information in footer"
+  },
+  "statusSaved": {
+    "message": "保存しました！",
+    "description": "Success message when settings are saved"
+  },
+  "statusCacheSaved": {
+    "message": "キャッシュ設定を保存しました！",
+    "description": "Success message when cache setting is saved"
+  },
+  "statusPromptSaved": {
+    "message": "カスタムプロンプトを保存しました！",
+    "description": "Success message when custom prompt is saved"
+  },
+  "statusError": {
+    "message": "保存エラー",
+    "description": "Error message when saving fails"
+  },
+  "confirmClearCache": {
+    "message": "すべてのキャッシュされた翻訳を削除してもよろしいですか？\n\nこの操作は元に戻せません。",
+    "description": "Confirmation dialog for clearing cache"
+  },
+  "statusNoCacheToClear": {
+    "message": "削除するキャッシュがありません",
+    "description": "Message when there's no cache to clear"
+  },
+  "statusCacheCleared": {
+    "message": "$count$件のキャッシュを削除しました！",
+    "description": "Message when cache is cleared",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "5"
+      },
+      "plural": {
+        "content": "$2",
+        "example": ""
+      }
+    }
+  },
+  "confirmResetGemini": {
+    "message": "Gemini チャットセッションをリセットしますか？\n\nこれにより、次回の翻訳時に新しいチャットが開始されます。古いチャット履歴は Gemini に残りますが、使用されません。",
+    "description": "Confirmation dialog for resetting Gemini chat"
+  },
+  "statusGeminiReset": {
+    "message": "Gemini チャットをリセットしました！次回の翻訳時に新しいチャットが開始されます。",
+    "description": "Message when Gemini chat is reset"
+  },
+  "statusResetError": {
+    "message": "チャットのリセットエラー",
+    "description": "Error message when resetting Gemini chat fails"
+  },
+  "langEnglish": {
+    "message": "英語",
+    "description": "Language name - English"
+  },
+  "langJapanese": {
+    "message": "日本語",
+    "description": "Language name - Japanese"
+  },
+  "langVietnamese": {
+    "message": "ベトナム語",
+    "description": "Language name - Vietnamese"
+  },
+  "langSpanish": {
+    "message": "スペイン語",
+    "description": "Language name - Spanish"
+  },
+  "langFrench": {
+    "message": "フランス語",
+    "description": "Language name - French"
+  },
+  "langGerman": {
+    "message": "ドイツ語",
+    "description": "Language name - German"
+  },
+  "langChinese": {
+    "message": "中国語（簡体字）",
+    "description": "Language name - Chinese"
+  },
+  "langKorean": {
+    "message": "韓国語",
+    "description": "Language name - Korean"
+  },
+  "langRussian": {
+    "message": "ロシア語",
+    "description": "Language name - Russian"
+  },
+  "langPortuguese": {
+    "message": "ポルトガル語",
+    "description": "Language name - Portuguese"
+  },
+  "copyButtonTitle": {
+    "message": "課題キー、タイトル、概要をコピー（マークダウン）",
+    "description": "Tooltip for copy button"
+  },
+  "copyButtonText": {
+    "message": "MDをコピー",
+    "description": "Text on copy button"
+  },
+  "copyNotyButtonTitle": {
+    "message": "通知をコピー（キー、タイトル、ステータス、日付）- パネルを自動で開きます",
+    "description": "Tooltip for copy notifications button"
+  },
+  "copyNotyButtonText": {
+    "message": "通知をコピー",
+    "description": "Text on copy notifications button"
+  },
+  "notificationCopied": {
+    "message": "クリップボードにコピーしました！",
+    "description": "Success notification after copying"
+  },
+  "notificationCopyFailed": {
+    "message": "コピーに失敗しました",
+    "description": "Error notification when copy fails"
+  },
+  "notificationNoIssueInfo": {
+    "message": "課題情報が見つかりません",
+    "description": "Error when no issue info found"
+  },
+  "notificationOpeningNoty": {
+    "message": "通知パネルを開いています...",
+    "description": "Notification when opening panel"
+  },
+  "notificationNoNotyFound": {
+    "message": "今月の通知が見つかりません",
+    "description": "Error when no notifications found"
+  },
+  "notificationNotyCopied": {
+    "message": "通知をクリップボードにコピーしました！",
+    "description": "Success after copying notifications"
+  },
+  "notificationNotyCopyFailed": {
+    "message": "通知のコピーに失敗しました",
+    "description": "Error when copying notifications fails"
+  },
+  "translateButtonTitle": {
+    "message": "このコンテンツを翻訳（クリック）または強制再翻訳（Ctrl+クリック）",
+    "description": "Tooltip for translate button"
+  },
+  "translateButtonText": {
+    "message": "翻訳",
+    "description": "Text on translate button"
+  },
+  "translatingText": {
+    "message": "翻訳中...",
+    "description": "Text shown while translating"
+  },
+  "dropdownMoreOptions": {
+    "message": "その他のオプション",
+    "description": "Tooltip for dropdown button"
+  },
+  "menuForceRetranslate": {
+    "message": "強制再翻訳",
+    "description": "Menu item to force re-translate"
+  },
+  "menuUseGemini": {
+    "message": "Gemini のみを使用",
+    "description": "Menu item to use Gemini only"
+  },
+  "menuUseGoogle": {
+    "message": "Google のみを使用",
+    "description": "Menu item to use Google only"
+  },
+  "translationMetaTranslatedBy": {
+    "message": "$source$ により $lang$ に翻訳",
+    "description": "Translation attribution",
+    "placeholders": {
+      "source": {
+        "content": "$1",
+        "example": "Google Translate"
+      },
+      "lang": {
+        "content": "$2",
+        "example": "English"
+      }
+    }
+  },
+  "translationMetaCached": {
+    "message": "（キャッシュ済み）",
+    "description": "Indicator that translation was cached"
+  },
+  "translationHideLink": {
+    "message": "非表示",
+    "description": "Link to hide translated block"
+  },
+  "notificationTranslatedTo": {
+    "message": "$lang$ に翻訳しました",
+    "description": "Success notification with target language",
+    "placeholders": {
+      "lang": {
+        "content": "$1",
+        "example": "English"
+      }
+    }
+  },
+  "notificationTranslationFailed": {
+    "message": "翻訳に失敗しました",
+    "description": "Error when translation fails"
+  },
+  "notificationNoTextToTranslate": {
+    "message": "翻訳するテキストコンテンツが見つかりません",
+    "description": "Error when no text found"
+  },
+  "sourceGoogle": {
+    "message": "Google 翻訳",
+    "description": "Translation source name - Google"
+  },
+  "sourceGemini": {
+    "message": "Gemini",
+    "description": "Translation source name - Gemini"
+  },
+  "issueTitleLabel": {
+    "message": "タイトル:",
+    "description": "Label for issue title in copied markdown"
+  },
+  "issueSummaryLabel": {
+    "message": "概要:",
+    "description": "Label for issue summary in copied markdown"
+  }
+}

@@ -1,0 +1,326 @@
+{
+  "extensionName": {
+    "message": "Backlog Utils",
+    "description": "Name of the extension"
+  },
+  "extensionDescription": {
+    "message": "Bộ công cụ tiện ích cho Backlog - sao chép issue, dịch nội dung, nâng cao quy trình làm việc, v.v.",
+    "description": "Description of the extension"
+  },
+  "popupTitle": {
+    "message": "Backlog Utils",
+    "description": "Title shown in popup header"
+  },
+  "popupSubtitle": {
+    "message": "Dịch thuật & Tùy chỉnh",
+    "description": "Subtitle shown in popup header"
+  },
+  "tabMain": {
+    "message": "Chính",
+    "description": "Main tab label"
+  },
+  "tabSettings": {
+    "message": "Cài đặt",
+    "description": "Settings tab label"
+  },
+  "targetLanguageLabel": {
+    "message": "Ngôn ngữ đích",
+    "description": "Label for target language selection"
+  },
+  "cacheSettingsTitle": {
+    "message": "Cài đặt bộ nhớ đệm",
+    "description": "Title for cache settings section"
+  },
+  "cacheDurationLabel": {
+    "message": "Lưu bản dịch trong",
+    "description": "Label for cache duration selection"
+  },
+  "cacheOptionNever": {
+    "message": "Không bao giờ (không lưu đệm)",
+    "description": "Cache duration option - never"
+  },
+  "cacheOption7Days": {
+    "message": "7 ngày",
+    "description": "Cache duration option - 7 days"
+  },
+  "cacheOption1Month": {
+    "message": "1 tháng",
+    "description": "Cache duration option - 1 month"
+  },
+  "cacheOptionForever": {
+    "message": "Vĩnh viễn",
+    "description": "Cache duration option - forever"
+  },
+  "noCachedTranslations": {
+    "message": "Không có bản dịch nào được lưu",
+    "description": "Shown when no translations are cached"
+  },
+  "cachingDisabled": {
+    "message": "Bộ nhớ đệm đã tắt",
+    "description": "Shown when caching is disabled"
+  },
+  "cachedTranslationsCount": {
+    "message": "$count$ bản dịch đã được lưu",
+    "description": "Shows number of cached translations",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "5"
+      },
+      "plural": {
+        "content": "$2",
+        "example": ""
+      }
+    }
+  },
+  "clearCacheButton": {
+    "message": "Xóa tất cả bộ nhớ đệm",
+    "description": "Button to clear all cached translations"
+  },
+  "customPromptLabel": {
+    "message": "Lệnh dịch tùy chỉnh",
+    "description": "Label for custom prompt textarea"
+  },
+  "customPromptHint": {
+    "message": "Sử dụng {lang} làm placeholder cho ngôn ngữ đích. Để trống để sử dụng lệnh mặc định.",
+    "description": "Hint text for custom prompt"
+  },
+  "savePromptButton": {
+    "message": "Lưu lệnh",
+    "description": "Button to save custom prompt"
+  },
+  "advancedTitle": {
+    "message": "Nâng cao",
+    "description": "Title for advanced settings section"
+  },
+  "resetGeminiButton": {
+    "message": "Đặt lại phiên chat Gemini",
+    "description": "Button to reset Gemini chat session"
+  },
+  "rateLimitInfo": {
+    "message": "Giới hạn: Tối đa 5 bản dịch mỗi phút",
+    "description": "Rate limit information in footer"
+  },
+  "engineInfo": {
+    "message": "Công cụ: Google Translate API (với Gemini dự phòng thử nghiệm)",
+    "description": "Translation engine information in footer"
+  },
+  "statusSaved": {
+    "message": "Đã lưu!",
+    "description": "Success message when settings are saved"
+  },
+  "statusCacheSaved": {
+    "message": "Đã lưu cài đặt bộ nhớ đệm!",
+    "description": "Success message when cache setting is saved"
+  },
+  "statusPromptSaved": {
+    "message": "Đã lưu lệnh tùy chỉnh!",
+    "description": "Success message when custom prompt is saved"
+  },
+  "statusError": {
+    "message": "Lỗi lưu",
+    "description": "Error message when saving fails"
+  },
+  "confirmClearCache": {
+    "message": "Bạn có chắc muốn xóa tất cả bản dịch đã lưu không?\n\nThao tác này không thể hoàn tác.",
+    "description": "Confirmation dialog for clearing cache"
+  },
+  "statusNoCacheToClear": {
+    "message": "Không có bộ nhớ đệm để xóa",
+    "description": "Message when there's no cache to clear"
+  },
+  "statusCacheCleared": {
+    "message": "Đã xóa $count$ bản dịch!",
+    "description": "Message when cache is cleared",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "5"
+      },
+      "plural": {
+        "content": "$2",
+        "example": ""
+      }
+    }
+  },
+  "confirmResetGemini": {
+    "message": "Đặt lại phiên chat Gemini?\n\nĐiều này sẽ bắt đầu chat mới cho lần dịch tiếp theo. Lịch sử chat cũ vẫn còn trong Gemini nhưng sẽ không được sử dụng.",
+    "description": "Confirmation dialog for resetting Gemini chat"
+  },
+  "statusGeminiReset": {
+    "message": "Đã đặt lại chat Gemini! Phiên chat mới sẽ bắt đầu ở lần dịch tiếp theo.",
+    "description": "Message when Gemini chat is reset"
+  },
+  "statusResetError": {
+    "message": "Lỗi đặt lại chat",
+    "description": "Error message when resetting Gemini chat fails"
+  },
+  "langEnglish": {
+    "message": "Tiếng Anh",
+    "description": "Language name - English"
+  },
+  "langJapanese": {
+    "message": "Tiếng Nhật",
+    "description": "Language name - Japanese"
+  },
+  "langVietnamese": {
+    "message": "Tiếng Việt",
+    "description": "Language name - Vietnamese"
+  },
+  "langSpanish": {
+    "message": "Tiếng Tây Ban Nha",
+    "description": "Language name - Spanish"
+  },
+  "langFrench": {
+    "message": "Tiếng Pháp",
+    "description": "Language name - French"
+  },
+  "langGerman": {
+    "message": "Tiếng Đức",
+    "description": "Language name - German"
+  },
+  "langChinese": {
+    "message": "Tiếng Trung (Giản thể)",
+    "description": "Language name - Chinese"
+  },
+  "langKorean": {
+    "message": "Tiếng Hàn",
+    "description": "Language name - Korean"
+  },
+  "langRussian": {
+    "message": "Tiếng Nga",
+    "description": "Language name - Russian"
+  },
+  "langPortuguese": {
+    "message": "Tiếng Bồ Đào Nha",
+    "description": "Language name - Portuguese"
+  },
+  "copyButtonTitle": {
+    "message": "Sao chép mã issue, tiêu đề & tóm tắt (markdown)",
+    "description": "Tooltip for copy button"
+  },
+  "copyButtonText": {
+    "message": "Sao chép MD",
+    "description": "Text on copy button"
+  },
+  "copyNotyButtonTitle": {
+    "message": "Sao chép thông báo (Mã, Tiêu đề, Trạng thái, Ngày) - tự động mở bảng",
+    "description": "Tooltip for copy notifications button"
+  },
+  "copyNotyButtonText": {
+    "message": "Sao chép TB",
+    "description": "Text on copy notifications button"
+  },
+  "notificationCopied": {
+    "message": "Đã sao chép vào clipboard!",
+    "description": "Success notification after copying"
+  },
+  "notificationCopyFailed": {
+    "message": "Sao chép thất bại",
+    "description": "Error notification when copy fails"
+  },
+  "notificationNoIssueInfo": {
+    "message": "Không tìm thấy thông tin issue",
+    "description": "Error when no issue info found"
+  },
+  "notificationOpeningNoty": {
+    "message": "Đang mở bảng thông báo...",
+    "description": "Notification when opening panel"
+  },
+  "notificationNoNotyFound": {
+    "message": "Không tìm thấy thông báo nào trong tháng này",
+    "description": "Error when no notifications found"
+  },
+  "notificationNotyCopied": {
+    "message": "Đã sao chép thông báo vào clipboard!",
+    "description": "Success after copying notifications"
+  },
+  "notificationNotyCopyFailed": {
+    "message": "Sao chép thông báo thất bại",
+    "description": "Error when copying notifications fails"
+  },
+  "translateButtonTitle": {
+    "message": "Dịch nội dung này (click) hoặc buộc dịch lại (Ctrl+click)",
+    "description": "Tooltip for translate button"
+  },
+  "translateButtonText": {
+    "message": "Dịch",
+    "description": "Text on translate button"
+  },
+  "translatingText": {
+    "message": "Đang dịch...",
+    "description": "Text shown while translating"
+  },
+  "dropdownMoreOptions": {
+    "message": "Thêm tùy chọn",
+    "description": "Tooltip for dropdown button"
+  },
+  "menuForceRetranslate": {
+    "message": "Buộc dịch lại",
+    "description": "Menu item to force re-translate"
+  },
+  "menuUseGemini": {
+    "message": "Chỉ dùng Gemini",
+    "description": "Menu item to use Gemini only"
+  },
+  "menuUseGoogle": {
+    "message": "Chỉ dùng Google",
+    "description": "Menu item to use Google only"
+  },
+  "translationMetaTranslatedBy": {
+    "message": "Được dịch bởi $source$ sang $lang$",
+    "description": "Translation attribution",
+    "placeholders": {
+      "source": {
+        "content": "$1",
+        "example": "Google Translate"
+      },
+      "lang": {
+        "content": "$2",
+        "example": "English"
+      }
+    }
+  },
+  "translationMetaCached": {
+    "message": " (đã lưu)",
+    "description": "Indicator that translation was cached"
+  },
+  "translationHideLink": {
+    "message": "Ẩn",
+    "description": "Link to hide translated block"
+  },
+  "notificationTranslatedTo": {
+    "message": "Đã dịch sang $lang$",
+    "description": "Success notification with target language",
+    "placeholders": {
+      "lang": {
+        "content": "$1",
+        "example": "English"
+      }
+    }
+  },
+  "notificationTranslationFailed": {
+    "message": "Dịch thất bại",
+    "description": "Error when translation fails"
+  },
+  "notificationNoTextToTranslate": {
+    "message": "Không tìm thấy nội dung văn bản để dịch",
+    "description": "Error when no text found"
+  },
+  "sourceGoogle": {
+    "message": "Google Dịch",
+    "description": "Translation source name - Google"
+  },
+  "sourceGemini": {
+    "message": "Gemini",
+    "description": "Translation source name - Gemini"
+  },
+  "issueTitleLabel": {
+    "message": "Tiêu đề:",
+    "description": "Label for issue title in copied markdown"
+  },
+  "issueSummaryLabel": {
+    "message": "Tóm tắt:",
+    "description": "Label for issue summary in copied markdown"
+  }
+}

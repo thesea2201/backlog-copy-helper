@@ -5,17 +5,62 @@
   const TRANSLATE_BTN_CLASS = 'backlog-utils-translate-btn';
   const TRANSLATED_BLOCK_CLASS = 'translated-block';
 
+  // Cached i18n strings
+  let i18nStrings = {};
+
+  // Load i18n strings from background script
+  async function loadI18nStrings() {
+    const keys = [
+      'copyButtonTitle', 'copyButtonText', 'copyNotyButtonTitle', 'copyNotyButtonText',
+      'notificationCopied', 'notificationCopyFailed', 'notificationNoIssueInfo',
+      'notificationOpeningNoty', 'notificationNoNotyFound', 'notificationNotyCopied',
+      'notificationNotyCopyFailed', 'translateButtonTitle', 'translateButtonText',
+      'translatingText', 'dropdownMoreOptions', 'menuForceRetranslate', 'menuUseGemini',
+      'menuUseGoogle', 'translationMetaTranslatedBy', 'translationMetaCached',
+      'translationHideLink', 'notificationTranslatedTo', 'notificationTranslationFailed',
+      'notificationNoTextToTranslate', 'sourceGoogle', 'sourceGemini',
+      'issueTitleLabel', 'issueSummaryLabel',
+      'langEnglish', 'langJapanese', 'langVietnamese', 'langSpanish', 'langFrench',
+      'langGerman', 'langChinese', 'langKorean', 'langRussian', 'langPortuguese'
+    ];
+
+    try {
+      const results = await Promise.all(
+        keys.map(key =>
+          chrome.runtime.sendMessage({ action: 'i18n', key })
+            .then(res => ({ key, message: res?.message || key }))
+        )
+      );
+      results.forEach(({ key, message }) => {
+        i18nStrings[key] = message;
+      });
+    } catch (err) {
+      console.error('Failed to load i18n strings:', err);
+    }
+  }
+
+  // Helper to get i18n string
+  function i18n(key, substitutions) {
+    let message = i18nStrings[key] || key;
+    if (substitutions) {
+      substitutions.forEach((sub, i) => {
+        message = message.replace(new RegExp(`\\$${i + 1}\\b`, 'g'), sub);
+      });
+    }
+    return message;
+  }
+
   const LANG_NAMES = {
-    'en': 'English',
-    'ja': 'Japanese',
-    'vi': 'Vietnamese',
-    'es': 'Spanish',
-    'fr': 'French',
-    'de': 'German',
-    'zh': 'Chinese',
-    'ko': 'Korean',
-    'ru': 'Russian',
-    'pt': 'Portuguese'
+    'en': i18n('langEnglish'),
+    'ja': i18n('langJapanese'),
+    'vi': i18n('langVietnamese'),
+    'es': i18n('langSpanish'),
+    'fr': i18n('langFrench'),
+    'de': i18n('langGerman'),
+    'zh': i18n('langChinese'),
+    'ko': i18n('langKorean'),
+    'ru': i18n('langRussian'),
+    'pt': i18n('langPortuguese')
   };
 
   function findIssueKey() {
@@ -39,19 +84,19 @@
 
   function formatMarkdown(issueKey, issueTitle, ticketSummary) {
     const parts = [];
-    
+
     if (issueKey) {
       parts.push(`**${issueKey}**`);
     }
-    
+
     if (issueTitle) {
-      parts.push(`**Title:** ${issueTitle}`);
+      parts.push(`**${i18n('issueTitleLabel')}** ${issueTitle}`);
     }
-    
+
     if (ticketSummary) {
-      parts.push(`**Summary:** ${ticketSummary}`);
+      parts.push(`**${i18n('issueSummaryLabel')}** ${ticketSummary}`);
     }
-    
+
     return parts.join('\n\n');
   }
 
@@ -93,7 +138,7 @@
     const ticketSummary = findTicketSummary();
 
     if (!issueKey && !issueTitle && !ticketSummary) {
-      showNotification('Could not find issue information', 'error');
+      showNotification(i18n('notificationNoIssueInfo'), 'error');
       return;
     }
 
@@ -101,9 +146,9 @@
     const success = await copyToClipboard(markdown);
 
     if (success) {
-      showNotification('Copied to clipboard!');
+      showNotification(i18n('notificationCopied'));
     } else {
-      showNotification('Failed to copy', 'error');
+      showNotification(i18n('notificationCopyFailed'), 'error');
     }
   }
 
@@ -114,13 +159,13 @@
     const button = document.createElement('button');
     button.id = COPY_BUTTON_ID;
     button.className = 'backlog-utils-copy-btn';
-    button.title = 'Copy issue key, title & summary (markdown)';
+    button.title = i18n('copyButtonTitle');
     button.innerHTML = `
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
         <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
       </svg>
-      <span>Copy MD</span>
+      <span>${i18n('copyButtonText')}</span>
     `;
     button.addEventListener('click', handleCopyClick);
 
@@ -203,20 +248,20 @@
 
     // Open panel and wait for it to render
     openNotificationsPanel();
-    showNotification('Opening notifications panel...');
+    showNotification(i18n('notificationOpeningNoty'));
 
     // Wait for panel to open and items to render
     setTimeout(async () => {
       const text = findNotifications();
       if (!text) {
-        showNotification('No notifications for current month found', 'error');
+        showNotification(i18n('notificationNoNotyFound'), 'error');
         return;
       }
       const success = await copyToClipboard(text);
       if (success) {
-        showNotification('Copied notifications to clipboard!');
+        showNotification(i18n('notificationNotyCopied'));
       } else {
-        showNotification('Failed to copy notifications', 'error');
+        showNotification(i18n('notificationNotyCopyFailed'), 'error');
       }
     }, 800);
   }
@@ -226,8 +271,8 @@
     const btn = document.createElement('button');
     btn.id = NOTY_BUTTON_ID;
     btn.className = 'backlog-utils-copy-noty-btn';
-    btn.title = 'Copy notifications (Key, Title, Status, Date) - auto-opens panel';
-    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg> <span>Copy Noty</span>`;
+    btn.title = i18n('copyNotyButtonTitle');
+    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg> <span>${i18n('copyNotyButtonText')}</span>`;
     btn.addEventListener('click', handleCopyNotyClick);
     return btn;
   }
@@ -284,7 +329,9 @@
     };
   }
 
-  function init() {
+  async function init() {
+    // Load i18n strings first
+    await loadI18nStrings();
     // Initial injection
     runInjection();
 
@@ -329,14 +376,14 @@
   function createTranslateButton() {
     const button = document.createElement('button');
     button.className = TRANSLATE_BTN_CLASS;
-    button.title = 'Translate this content (click) or force re-translate (Ctrl+click)';
+    button.title = i18n('translateButtonTitle');
     button.innerHTML = `
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
         <line x1="2" y1="12" x2="22" y2="12"></line>
         <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
       </svg>
-      <span>Translate</span>
+      <span>${i18n('translateButtonText')}</span>
     `;
     return button;
   }
@@ -360,7 +407,7 @@
 
     const dropdownBtn = document.createElement('button');
     dropdownBtn.className = TRANSLATE_BTN_CLASS + ' dropdown';
-    dropdownBtn.title = 'More options';
+    dropdownBtn.title = i18n('dropdownMoreOptions');
     dropdownBtn.style.cssText = 'padding: 2px 4px; margin-left: 0;';
     dropdownBtn.innerHTML = `
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -385,13 +432,13 @@
     `;
     menu.innerHTML = `
       <div class="menu-item" data-action="force" style="padding: 8px 12px; cursor: pointer; font-size: 12px; color: #333; hover: background: #f5f5f5;">
-        🔄 Force re-translate
+        🔄 ${i18n('menuForceRetranslate')}
       </div>
       <div class="menu-item" data-action="gemini" style="padding: 8px 12px; cursor: pointer; font-size: 12px; color: #333; hover: background: #f5f5f5;">
-        ✨ Use Gemini only
+        ✨ ${i18n('menuUseGemini')}
       </div>
       <div class="menu-item" data-action="google" style="padding: 8px 12px; cursor: pointer; font-size: 12px; color: #333; hover: background: #f5f5f5;">
-        🔤 Use Google only
+        🔤 ${i18n('menuUseGoogle')}
       </div>
     `;
 
@@ -443,19 +490,20 @@
     const langName = LANG_NAMES[targetLang] || targetLang;
     const isCached = source.includes('(cached)');
     const baseSource = source.replace(' (cached)', '');
-    const sourceName = baseSource === 'gemini' ? 'Gemini' : 'Google Translate';
-    const cacheIndicator = isCached ? ' (cached)' : '';
+    const sourceName = baseSource === 'gemini' ? i18n('sourceGemini') : i18n('sourceGoogle');
+    const cacheIndicator = isCached ? i18n('translationMetaCached') : '';
 
     const block = document.createElement('div');
     block.className = TRANSLATED_BLOCK_CLASS;
     if (isCached) {
       block.classList.add('cached');
     }
+    const translatedByText = i18n('translationMetaTranslatedBy', [sourceName + cacheIndicator, langName]);
     block.innerHTML = `
       <div class="translated-content">${escapeHtml(translatedText).replace(/\n\n/g, '<br><br>')}</div>
       <div class="translation-meta">
-        <span class="translation-source">Translated by ${sourceName}${cacheIndicator} to ${langName}</span>
-        <a href="#" class="remove-translation">Hide</a>
+        <span class="translation-source">${translatedByText}</span>
+        <a href="#" class="remove-translation">${i18n('translationHideLink')}</a>
       </div>
     `;
 
@@ -487,7 +535,7 @@
 
     // Show loading state
     button.disabled = true;
-    button.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg> <span>Translating...</span>`;
+    button.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg> <span>${i18n('translatingText')}</span>`;
 
     try {
       // Debug: log what we're working with
@@ -507,7 +555,7 @@
       console.log('Extracted plainText:', plainText.substring(0, 200));
 
       if (!plainText || plainText.length < 2) {
-        showNotification('No text content found to translate', 'error');
+        showNotification(i18n('notificationNoTextToTranslate'), 'error');
         return;
       }
 
@@ -520,13 +568,13 @@
 
       if (response.success) {
         showTranslatedBlock(targetElement, response.text, button, response.targetLang, response.source);
-        showNotification(`Translated to ${LANG_NAMES[response.targetLang] || response.targetLang}`, 'success');
+        showNotification(i18n('notificationTranslatedTo', [LANG_NAMES[response.targetLang] || response.targetLang]), 'success');
       } else {
-        showNotification(response.error || 'Translation failed', 'error');
+        showNotification(response.error || i18n('notificationTranslationFailed'), 'error');
       }
     } catch (err) {
       console.error('Translation error:', err);
-      showNotification('Translation failed: ' + err.message, 'error');
+      showNotification(i18n('notificationTranslationFailed') + ': ' + err.message, 'error');
     } finally {
       // Restore button
       button.disabled = false;
@@ -536,7 +584,7 @@
           <line x1="2" y1="12" x2="22" y2="12"></line>
           <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
         </svg>
-        <span>Translate</span>
+        <span>${i18n('translateButtonText')}</span>
       `;
     }
   }
