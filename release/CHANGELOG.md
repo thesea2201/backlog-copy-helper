@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced popup UI with tabbed interface (Main / Settings).
 - Gemini chat session persistence across browser sessions.
 
-## [1.2.0] - 2026-04-??
+## [1.2.0] - 2026-04-24
 
 ### Added
 - **Copy Notifications** (`Copy Noty`) button next to the notifications bell.
@@ -37,12 +37,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Columns: Issue Key, Issue Title, Status, Date (YYYY-MM-DD).
   - Useful for importing into spreadsheets for reporting.
 
-## [1.1.0] - 2026-04-??
+## [1.1.0] - 2026-04-24
 
 ### Added
 - **Notification Copy Feature** (initial version).
 
-## [1.0.0] - 2026-04-??
+## [1.0.0] - 2026-04-24
 
 ### Added
 - **Copy Markdown** (`Copy MD`) button on Backlog issue pages.
