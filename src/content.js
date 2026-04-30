@@ -185,8 +185,11 @@
   }
 
   function isNotificationsPanelOpen() {
-    const panel = document.querySelector('.slide-in--notifications, .notifications-panel, [data-testid="notificationsPanel"]');
-    return panel && panel.offsetParent !== null;
+    // Look for various panel selectors - the scroll container or its parent
+    const panel = document.querySelector('#globalNotificationsContainer, .slide-in--notifications, .slide-in.global-nav-content.-notifications, .notifications-panel, [data-testid="notificationsPanel"]');
+    const scrollContainer = document.querySelector('.slide-in__content--notifications, .js-notifications-content, .notifications-content, #globalNotificationsContainer .slide-in__content');
+    const container = scrollContainer || panel;
+    return container && container.offsetParent !== null;
   }
 
   function findNotifications() {
@@ -195,11 +198,93 @@
       openNotificationsPanel();
     }
 
-    // Wait a bit for panel to render
-    const items = document.querySelectorAll('.notification-list__item, .notification-item');
+    // Find the scrollable container - search directly in document
+    // The scroll container might not be inside a specific panel element
+    const scrollContainer = document.querySelector('#globalNotificationsContainer .slide-in__content--notifications, .slide-in__content--notifications, .js-notifications-content, #globalNotificationsContainer .slide-in__content, .notifications-content') ||
+                           document.querySelector('#globalNotificationsContainer') ||
+                           document.querySelector('.slide-in .notification-list')?.closest('.slide-in__content, .slide-in') ||
+                           document.querySelector('.notification-list')?.parentElement;
+
+    // Scroll to load all items (lazy loading/virtual scroll)
     const now = new Date();
     const curMonth = now.getMonth();
     const curYear = now.getFullYear();
+
+    console.log('[Backlog Utils] findNotifications - scrollContainer:', scrollContainer);
+    console.log('[Backlog Utils] scrollContainer scrollHeight:', scrollContainer?.scrollHeight);
+    console.log('[Backlog Utils] scrollContainer clientHeight:', scrollContainer?.clientHeight);
+    console.log('[Backlog Utils] isNotificationsPanelOpen():', isNotificationsPanelOpen());
+
+    // Re-open panel if it closed during the wait
+    if (!isNotificationsPanelOpen()) {
+      console.log('[Backlog Utils] Panel closed, re-opening...');
+      openNotificationsPanel();
+      // Wait for panel to re-open and render in DOM
+      const start = Date.now();
+      while (Date.now() - start < 800) {}
+    }
+
+    // Try finding scroll container again after potential re-open
+    const scrollContainerRetry = document.querySelector('#globalNotificationsContainer .slide-in__content--notifications, .slide-in__content--notifications, .js-notifications-content, #globalNotificationsContainer .slide-in__content, .notifications-content') ||
+                                 document.querySelector('#globalNotificationsContainer');
+    const finalScrollContainer = scrollContainer || scrollContainerRetry;
+    if (!scrollContainer && scrollContainerRetry) {
+      console.log('[Backlog Utils] Found scroll container after retry');
+    }
+
+    // Log notification items found
+    const allItems = document.querySelectorAll('.notification-list__item, .notification-item');
+    console.log('[Backlog Utils] Total notification items in DOM:', allItems.length);
+
+    if (finalScrollContainer) {
+      // Scroll to bottom in chunks to trigger lazy loading
+      let previousScrollHeight = 0;
+      let scrollAttempts = 0;
+      const maxAttempts = 10;
+      let foundPrevMonth = false;
+
+      while (scrollAttempts < maxAttempts && !foundPrevMonth) {
+        const currentScrollHeight = finalScrollContainer.scrollHeight;
+        console.log(`[Backlog Utils] Scroll attempt ${scrollAttempts + 1}: scrollHeight=${currentScrollHeight}, previous=${previousScrollHeight}`);
+
+        if (currentScrollHeight === previousScrollHeight && scrollAttempts > 0) {
+          console.log('[Backlog Utils] No new content loaded, stopping scroll');
+          break;
+        }
+        previousScrollHeight = currentScrollHeight;
+        finalScrollContainer.scrollTop = currentScrollHeight;
+        console.log(`[Backlog Utils] Scrolled to: ${finalScrollContainer.scrollTop}`);
+        scrollAttempts++;
+        // Small delay to allow lazy loading to trigger
+        const start = Date.now();
+        while (Date.now() - start < 150) {} // Busy wait ~150ms
+
+        // Check if we've scrolled to previous month records
+        const visibleItems = finalScrollContainer.querySelectorAll('.notification-list__item, .notification-item');
+        console.log(`[Backlog Utils] Visible items after scroll: ${visibleItems.length}`);
+        for (const item of visibleItems) {
+          const timeEl = item.querySelector('.js-notification-time, .notification-time');
+          if (timeEl && timeEl.title) {
+            const itemDate = new Date(timeEl.title);
+            console.log(`[Backlog Utils] Item date: ${timeEl.title} -> month=${itemDate.getMonth()}, year=${itemDate.getFullYear()} (checking against ${curMonth}/${curYear})`);
+            if (itemDate.getMonth() !== curMonth || itemDate.getFullYear() !== curYear) {
+              console.log('[Backlog Utils] Found previous month item, stopping scroll');
+              foundPrevMonth = true;
+              break;
+            }
+          }
+        }
+      }
+
+      // Scroll back to top to ensure we capture all items
+      finalScrollContainer.scrollTop = 0;
+      console.log('[Backlog Utils] Scrolled back to top');
+    } else {
+      console.log('[Backlog Utils] No scroll container found!');
+    }
+
+    // Wait a bit for panel to render after scrolling
+    const items = document.querySelectorAll('.notification-list__item, .notification-item');
     const seen = new Set();
     const lines = [];
 
@@ -236,7 +321,7 @@
 
       // Format: Key, Title, Status, Date
       const dateStr = date.toISOString().split('T')[0];
-      lines.push(`${key}\t${title}\t${status}\t${dateStr}`);
+      lines.push(`${key} ${title}\t${status}\t${dateStr}`);
     });
 
     return lines.join('\n');
@@ -246,8 +331,10 @@
     e.preventDefault();
     e.stopPropagation();
 
-    // Open panel and wait for it to render
-    openNotificationsPanel();
+    // Open panel if not already open (avoid toggling it closed)
+    if (!isNotificationsPanelOpen()) {
+      openNotificationsPanel();
+    }
     showNotification(i18n('notificationOpeningNoty'));
 
     // Wait for panel to open and items to render
@@ -263,7 +350,7 @@
       } else {
         showNotification(i18n('notificationNotyCopyFailed'), 'error');
       }
-    }, 800);
+    }, 500);
   }
 
   function createNotyButton() {
