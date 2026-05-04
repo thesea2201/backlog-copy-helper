@@ -15,10 +15,10 @@
       'notificationCopied', 'notificationCopyFailed', 'notificationNoIssueInfo',
       'notificationOpeningNoty', 'notificationNoNotyFound', 'notificationNotyCopied',
       'notificationNotyCopyFailed', 'translateButtonTitle', 'translateButtonText',
-      'translatingText', 'dropdownMoreOptions', 'menuForceRetranslate', 'menuUseGemini',
+      'translatingText', 'dropdownMoreOptions',       'menuForceRetranslate', 'menuUseGemini', 'menuUseChatGPT',
       'menuUseGoogle', 'translationMetaTranslatedBy', 'translationMetaCached',
       'translationHideLink', 'notificationTranslatedTo', 'notificationTranslationFailed',
-      'notificationNoTextToTranslate', 'sourceGoogle', 'sourceGemini',
+      'notificationNoTextToTranslate', 'sourceGoogle', 'sourceGemini', 'sourceChatGPT',
       'issueTitleLabel', 'issueSummaryLabel',
       'langEnglish', 'langJapanese', 'langVietnamese', 'langSpanish', 'langFrench',
       'langGerman', 'langChinese', 'langKorean', 'langRussian', 'langPortuguese'
@@ -524,6 +524,9 @@
       <div class="menu-item" data-action="gemini" style="padding: 8px 12px; cursor: pointer; font-size: 12px; color: #333; hover: background: #f5f5f5;">
         ✨ ${i18n('menuUseGemini')}
       </div>
+      <div class="menu-item" data-action="chatgpt" style="padding: 8px 12px; cursor: pointer; font-size: 12px; color: #333; hover: background: #f5f5f5;">
+        🤖 ${i18n('menuUseChatGPT')}
+      </div>
       <div class="menu-item" data-action="google" style="padding: 8px 12px; cursor: pointer; font-size: 12px; color: #333; hover: background: #f5f5f5;">
         🔤 ${i18n('menuUseGoogle')}
       </div>
@@ -541,7 +544,7 @@
         e.stopPropagation();
         menu.style.display = 'none';
         const action = item.dataset.action;
-        handleTranslateClick(e, contentEl, action === 'force', action === 'gemini' ? 'gemini' : action === 'google' ? 'google' : null);
+        handleTranslateClick(e, contentEl, action === 'force', action === 'gemini' ? 'gemini' : action === 'chatgpt' ? 'chatgpt' : action === 'google' ? 'google' : null);
       });
     });
 
@@ -577,7 +580,14 @@
     const langName = LANG_NAMES[targetLang] || targetLang;
     const isCached = source.includes('(cached)');
     const baseSource = source.replace(' (cached)', '');
-    const sourceName = baseSource === 'gemini' ? i18n('sourceGemini') : i18n('sourceGoogle');
+    let sourceName;
+    if (baseSource === 'gemini') {
+      sourceName = i18n('sourceGemini');
+    } else if (baseSource === 'chatgpt') {
+      sourceName = i18n('sourceChatGPT');
+    } else {
+      sourceName = i18n('sourceGoogle');
+    }
     const cacheIndicator = isCached ? i18n('translationMetaCached') : '';
 
     const block = document.createElement('div');

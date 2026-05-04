@@ -276,6 +276,14 @@
 
   <div class="tab-content" id="tab-settings">
     <div class="form-group">
+      <label for="defaultEngine" data-i18n="defaultEngineLabel">Default Translation Engine</label>
+      <select id="defaultEngine">
+        <option value="gemini" data-i18n="engineOptionGemini">Gemini (AI)</option>
+        <option value="chatgpt" data-i18n="engineOptionChatGPT">ChatGPT (AI)</option>
+        <option value="google" data-i18n="engineOptionGoogle">Google Translate</option>
+      </select>
+    </div>
+    <div class="form-group">
       <label for="customPrompt" data-i18n="customPromptLabel">Custom Translation Prompt</label>
       <textarea id="customPrompt" rows="5" placeholder="Enter your custom translation instructions..."></textarea>
       <p class="hint" data-i18n="customPromptHint">Use <code>{lang}</code> as placeholder for target language. Leave empty to use default prompt.</p>
@@ -285,12 +293,13 @@
     <div class="section">
       <h4 class="section-title" data-i18n="advancedTitle">Advanced</h4>
       <button class="btn btn-warning" id="resetGeminiChatBtn" data-i18n="resetGeminiButton">Reset Gemini Chat Session</button>
+      <button class="btn btn-warning" id="resetChatGPTBtn" data-i18n="resetChatGPTButton">Reset ChatGPT Chat Session</button>
     </div>
   </div>
 
   <div class="footer">
     <strong>Rate Limit:</strong> <span data-i18n="rateLimitInfo">Max 5 translations per minute</span><br>
-    <strong>Engine:</strong> <span data-i18n="engineInfo">Google Translate API (with Gemini experimental fallback)</span>
+    <strong>Engine:</strong> <span data-i18n="engineInfo">Engines: Gemini, ChatGPT (AI), Google Translate</span>
   </div>
 
   <div class="status" id="status"></div>

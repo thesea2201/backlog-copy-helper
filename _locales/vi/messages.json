@@ -102,7 +102,7 @@
     "description": "Rate limit information in footer"
   },
   "engineInfo": {
-    "message": "Công cụ: Google Translate API (với Gemini dự phòng thử nghiệm)",
+    "message": "Công cụ: Gemini, ChatGPT (AI), Google Dịch",
     "description": "Translation engine information in footer"
   },
   "statusSaved": {
@@ -314,6 +314,42 @@
   "sourceGemini": {
     "message": "Gemini",
     "description": "Translation source name - Gemini"
+  },
+  "menuUseChatGPT": {
+    "message": "Chỉ dùng ChatGPT",
+    "description": "Menu item to use ChatGPT only"
+  },
+  "sourceChatGPT": {
+    "message": "ChatGPT",
+    "description": "Translation source name - ChatGPT"
+  },
+  "resetChatGPTButton": {
+    "message": "Đặt lại phiên chat ChatGPT",
+    "description": "Button to reset ChatGPT chat session"
+  },
+  "confirmResetChatGPT": {
+    "message": "Đặt lại phiên chat ChatGPT?\n\nĐiều này sẽ bắt đầu chat mới cho lần dịch tiếp theo. Lịch sử chat cũ vẫn còn trong ChatGPT nhưng sẽ không được sử dụng.",
+    "description": "Confirmation dialog for resetting ChatGPT chat"
+  },
+  "statusChatGPTReset": {
+    "message": "Đã đặt lại chat ChatGPT! Phiên chat mới sẽ bắt đầu ở lần dịch tiếp theo.",
+    "description": "Message when ChatGPT chat is reset"
+  },
+  "defaultEngineLabel": {
+    "message": "Công cụ dịch mặc định",
+    "description": "Label for default engine selection"
+  },
+  "engineOptionGemini": {
+    "message": "Gemini (AI)",
+    "description": "Engine option - Gemini"
+  },
+  "engineOptionChatGPT": {
+    "message": "ChatGPT (AI)",
+    "description": "Engine option - ChatGPT"
+  },
+  "engineOptionGoogle": {
+    "message": "Google Dịch",
+    "description": "Engine option - Google Translate"
   },
   "issueTitleLabel": {
     "message": "Tiêu đề:",

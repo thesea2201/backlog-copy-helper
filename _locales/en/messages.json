@@ -102,7 +102,7 @@
     "description": "Rate limit information in footer"
   },
   "engineInfo": {
-    "message": "Engine: Google Translate API (with Gemini experimental fallback)",
+    "message": "Engines: Gemini, ChatGPT (AI), Google Translate",
     "description": "Translation engine information in footer"
   },
   "statusSaved": {
@@ -314,6 +314,42 @@
   "sourceGemini": {
     "message": "Gemini",
     "description": "Translation source name - Gemini"
+  },
+  "menuUseChatGPT": {
+    "message": "Use ChatGPT only",
+    "description": "Menu item to use ChatGPT only"
+  },
+  "sourceChatGPT": {
+    "message": "ChatGPT",
+    "description": "Translation source name - ChatGPT"
+  },
+  "resetChatGPTButton": {
+    "message": "Reset ChatGPT Chat Session",
+    "description": "Button to reset ChatGPT chat session"
+  },
+  "confirmResetChatGPT": {
+    "message": "Reset ChatGPT chat session?\n\nThis will start a fresh chat next time you translate. The old chat history will remain in ChatGPT but won't be used.",
+    "description": "Confirmation dialog for resetting ChatGPT chat"
+  },
+  "statusChatGPTReset": {
+    "message": "ChatGPT chat reset! Fresh chat will start next translation.",
+    "description": "Message when ChatGPT chat is reset"
+  },
+  "defaultEngineLabel": {
+    "message": "Default Translation Engine",
+    "description": "Label for default engine selection"
+  },
+  "engineOptionGemini": {
+    "message": "Gemini (AI)",
+    "description": "Engine option - Gemini"
+  },
+  "engineOptionChatGPT": {
+    "message": "ChatGPT (AI)",
+    "description": "Engine option - ChatGPT"
+  },
+  "engineOptionGoogle": {
+    "message": "Google Translate",
+    "description": "Engine option - Google Translate"
   },
   "issueTitleLabel": {
     "message": "Title:",

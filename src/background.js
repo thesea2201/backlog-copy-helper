@@ -173,6 +173,15 @@
   const GEMINI_TIMEOUT_MS = 30000; // 30 seconds timeout
   const STORAGE_KEY_CHAT_ID = 'backlogUtilsGeminiChatId';
 
+  // ChatGPT session management
+  let chatgptTabId = null;
+  const CHATGPT_BASE_URL = 'https://chatgpt.com';
+  const CHATGPT_TIMEOUT_MS = 60000; // 60 seconds timeout (ChatGPT is slower)
+  const STORAGE_KEY_CHATGPT_CHAT_URL = 'backlogUtilsChatGPTChatUrl';
+
+  // Default engine preference
+  const STORAGE_KEY_DEFAULT_ENGINE = 'backlogUtilsDefaultEngine';
+
   // Language name mapping for Gemini prompts
   const LANG_NAMES_FULL = {
     'en': 'English',
@@ -198,6 +207,40 @@
 
   async function clearChatId() {
     await chrome.storage.local.remove(STORAGE_KEY_CHAT_ID);
+  }
+
+  // ChatGPT URL management
+  async function getSavedChatGPTUrl() {
+    const result = await chrome.storage.local.get([STORAGE_KEY_CHATGPT_CHAT_URL]);
+    return result[STORAGE_KEY_CHATGPT_CHAT_URL] || null;
+  }
+
+  async function saveChatGPTUrl(url) {
+    await chrome.storage.local.set({ [STORAGE_KEY_CHATGPT_CHAT_URL]: url });
+  }
+
+  async function clearChatGPTUrl() {
+    await chrome.storage.local.remove(STORAGE_KEY_CHATGPT_CHAT_URL);
+  }
+
+  // Extract chat URL from ChatGPT tab
+  // Handles both: /c/<id> (single chat) and /g/<gizmo>/c/<id> (project chat)
+  async function extractChatGPTUrlFromTab(tabId) {
+    try {
+      const tab = await chrome.tabs.get(tabId);
+      if (!tab.url) return null;
+      // Match /c/<uuid> pattern at end of path
+      const match = tab.url.match(/chatgpt\.com\/(.*)/);
+      if (!match) return null;
+      const path = match[1];
+      // Only save URLs that contain a chat ID (not the main page)
+      if (path.includes('/c/')) {
+        return tab.url;
+      }
+      return null;
+    } catch (err) {
+      return null;
+    }
   }
 
   // Extract chat ID from Gemini URL: gemini.google.com/app/{chatId}
@@ -569,6 +612,246 @@
     }
   }
 
+  // --- ChatGPT functions ---
+
+  async function getOrCreateChatGPTTab() {
+    if (chatgptTabId) {
+      try {
+        const tab = await chrome.tabs.get(chatgptTabId);
+        if (tab && !tab.discarded) {
+          return chatgptTabId;
+        }
+      } catch (err) {
+        chatgptTabId = null;
+      }
+    }
+
+    const savedUrl = await getSavedChatGPTUrl();
+    const url = savedUrl || CHATGPT_BASE_URL;
+
+    const tab = await chrome.tabs.create({ url, active: false, pinned: true });
+    chatgptTabId = tab.id;
+
+    await waitForTabLoad(chatgptTabId, 15000);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    return chatgptTabId;
+  }
+
+  async function sendPromptToChatGPT(tabId, prompt) {
+    console.log('Sending prompt to ChatGPT, length:', prompt?.length);
+    const results = await chrome.scripting.executeScript({
+      target: { tabId },
+      func: async (userPrompt) => {
+        const inputEl = document.querySelector('#prompt-textarea')
+          || document.querySelector('div[contenteditable="true"].ProseMirror')
+          || document.querySelector('div[contenteditable="true"]');
+
+        if (!inputEl) {
+          return { success: false, error: 'Could not find ChatGPT input element' };
+        }
+
+        console.log('Found ChatGPT input:', inputEl.tagName, inputEl.id, inputEl.className);
+
+        inputEl.focus();
+        inputEl.click();
+
+        if (inputEl.tagName === 'P' || inputEl.querySelector('br') !== null) {
+          inputEl.innerHTML = '';
+        } else {
+          inputEl.innerHTML = '<p></p>';
+        }
+
+        const paragraphs = userPrompt.split('\n');
+        const htmlContent = paragraphs.map(p => {
+          const escaped = p
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+          return `<p>${escaped}</p>`;
+        }).join('');
+
+        inputEl.innerHTML = htmlContent;
+
+        inputEl.dispatchEvent(new InputEvent('input', {
+          bubbles: true,
+          inputType: 'insertText',
+          data: userPrompt
+        }));
+
+        const parent = inputEl.closest('form') || inputEl.parentElement;
+        if (parent && parent !== inputEl) {
+          parent.dispatchEvent(new InputEvent('input', { bubbles: true }));
+        }
+
+        await new Promise(r => setTimeout(r, 200));
+
+        const sendBtn = document.querySelector('button[data-testid="send-button"]')
+          || document.querySelector('button[aria-label="Send prompt"]')
+          || document.querySelector('button svg[width="24"]')?.closest('button');
+
+        if (!sendBtn) {
+          const buttons = document.querySelectorAll('button');
+          for (const btn of buttons) {
+            if (btn.querySelector('svg') && !btn.disabled && btn.offsetParent !== null) {
+              const rect = btn.getBoundingClientRect();
+              if (rect.right > window.innerWidth - 80) {
+                sendBtn = btn;
+                break;
+              }
+            }
+          }
+        }
+
+        if (!sendBtn) {
+          return { success: false, error: 'Could not find send button' };
+        }
+
+        if (sendBtn.disabled) {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              if (!sendBtn.disabled) {
+                sendBtn.click();
+                resolve({ success: true });
+              } else {
+                resolve({ success: false, error: 'Send button is disabled' });
+              }
+            }, 500);
+          });
+        }
+
+        sendBtn.click();
+        return { success: true };
+      },
+      args: [prompt]
+    });
+
+    return results[0]?.result;
+  }
+
+  async function waitForChatGPTResponse(tabId, timeoutMs = CHATGPT_TIMEOUT_MS) {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    const startTime = Date.now();
+    const checkInterval = 800;
+
+    while (Date.now() - startTime < timeoutMs) {
+      await new Promise((resolve) => setTimeout(resolve, checkInterval));
+
+      try {
+        const results = await chrome.scripting.executeScript({
+          target: { tabId },
+          func: () => {
+            const stopBtn = document.querySelector('button[data-testid="stop-button"]')
+              || document.querySelector('button[aria-label="Stop streaming"]')
+              || document.querySelector('button[aria-label="Stop generating"]');
+
+            if (stopBtn && stopBtn.offsetParent !== null) {
+              return { done: false, loading: true };
+            }
+
+            const messages = document.querySelectorAll('[data-message-author-role="assistant"]');
+            if (!messages.length) {
+              return { done: false, loading: false };
+            }
+
+            const lastMsg = messages[messages.length - 1];
+
+            const markdownEl = lastMsg.querySelector('.markdown')
+              || lastMsg.querySelector('.prose')
+              || lastMsg.querySelector('[data-message-content]')
+              || lastMsg;
+
+            const text = (markdownEl.innerText || markdownEl.textContent || '').trim();
+            if (text.length > 0) {
+              return { done: true, text };
+            }
+
+            return { done: false, loading: false };
+          }
+        });
+
+        const result = results[0]?.result;
+        if (result?.done) {
+          return result.text;
+        }
+      } catch (err) {
+        console.error('Error checking ChatGPT response:', err);
+      }
+    }
+
+    throw new Error('Timeout waiting for ChatGPT response');
+  }
+
+  async function attemptChatGPTSession(text, targetLang) {
+    const langName = LANG_NAMES_FULL[targetLang] || targetLang;
+
+    if (!text || text.trim().length === 0) {
+      throw new Error('No text content provided for translation');
+    }
+
+    const customPromptResult = await chrome.storage.sync.get(['backlogUtilsCustomPrompt']);
+    const defaultPrompt = `Translate the following text to ${langName}. Only return the translation, no explanations:`;
+    const customPromptTemplate = customPromptResult.backlogUtilsCustomPrompt || defaultPrompt;
+    const promptPrefix = customPromptTemplate.replace(/{lang}/g, langName);
+    const prompt = `${promptPrefix}\n\n${text}`;
+    console.log('ChatGPT prompt length:', prompt.length);
+
+    const savedUrl = await getSavedChatGPTUrl();
+    console.log('Saved ChatGPT URL:', savedUrl);
+
+    const originalTab = await chrome.tabs.query({ active: true, currentWindow: true });
+    const originalTabId = originalTab[0]?.id;
+
+    try {
+      const tabId = await getOrCreateChatGPTTab();
+
+      const currentTab = await chrome.tabs.get(tabId);
+      console.log('Current ChatGPT tab URL:', currentTab.url);
+
+      await chrome.tabs.update(tabId, { active: true });
+      console.log('Activated ChatGPT tab for translation');
+
+      const sendResult = await sendPromptToChatGPT(tabId, prompt);
+      console.log('ChatGPT send result:', sendResult);
+
+      if (!sendResult?.success) {
+        throw new Error(sendResult?.error || 'Failed to send prompt to ChatGPT');
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const chatUrl = await extractChatGPTUrlFromTab(tabId);
+      console.log('Extracted ChatGPT URL:', chatUrl);
+
+      if (chatUrl && chatUrl !== savedUrl) {
+        await saveChatGPTUrl(chatUrl);
+        console.log('New ChatGPT URL saved:', chatUrl);
+      }
+
+      const response = await waitForChatGPTResponse(tabId);
+
+      if (originalTabId && originalTabId !== tabId) {
+        try {
+          await chrome.tabs.update(originalTabId, { active: true });
+          console.log('Returned focus to original tab:', originalTabId);
+        } catch (e) {
+          console.log('Could not return focus:', e.message);
+        }
+      }
+
+      return response;
+    } catch (err) {
+      console.error('ChatGPT session error:', err);
+      if (chatgptTabId) {
+        try { await chrome.tabs.remove(chatgptTabId); } catch (e) {}
+        chatgptTabId = null;
+      }
+      await clearChatGPTUrl();
+      throw err;
+    }
+  }
+
   // Main translation function with caching
   async function translateText(text, targetLang, force = false, engine = null) {
     // Check cache first (skip if force re-translate requested)
@@ -592,6 +875,15 @@
       console.log('Force re-translate: cleared cache for this text');
     }
 
+    // Read default engine preference (default: 'gemini')
+    let defaultEngine = 'gemini';
+    try {
+      const defaultEngineResult = await chrome.storage.sync.get([STORAGE_KEY_DEFAULT_ENGINE]);
+      defaultEngine = defaultEngineResult[STORAGE_KEY_DEFAULT_ENGINE] || 'gemini';
+    } catch (e) {
+      // Fall through with 'gemini' default
+    }
+
     // Engine preference: 'gemini' only
     if (engine === 'gemini') {
       try {
@@ -600,6 +892,17 @@
         return { success: true, text: geminiResult, source: 'gemini (forced)', targetLang };
       } catch (geminiErr) {
         return { success: false, error: 'Gemini failed: ' + geminiErr.message };
+      }
+    }
+
+    // Engine preference: 'chatgpt' only
+    if (engine === 'chatgpt') {
+      try {
+        const chatgptResult = await attemptChatGPTSession(text, targetLang);
+        await setCachedTranslation(text, targetLang, chatgptResult, 'chatgpt');
+        return { success: true, text: chatgptResult, source: 'chatgpt (forced)', targetLang };
+      } catch (chatgptErr) {
+        return { success: false, error: 'ChatGPT failed: ' + chatgptErr.message };
       }
     }
 
@@ -614,23 +917,31 @@
       }
     }
 
-    // Default: First try Gemini (experimental), then fallback to Google
-    try {
-      const geminiResult = await attemptGeminiSession(text, targetLang);
-      await setCachedTranslation(text, targetLang, geminiResult, 'gemini');
-      return { success: true, text: geminiResult, source: 'gemini', targetLang };
-    } catch (geminiErr) {
-      console.log('Gemini session failed, falling back to Google Translate:', geminiErr.message);
+    // Default: Try user's preferred engine first, then fallback through others
+    const engines = defaultEngine === 'chatgpt'
+      ? ['chatgpt', 'gemini', 'google']
+      : defaultEngine === 'google'
+        ? ['google', 'gemini', 'chatgpt']
+        : ['gemini', 'chatgpt', 'google']; // default: gemini first
+
+    for (const eng of engines) {
+      try {
+        let result;
+        if (eng === 'chatgpt') {
+          result = await attemptChatGPTSession(text, targetLang);
+        } else if (eng === 'google') {
+          result = await translateWithGoogle(text, targetLang);
+        } else {
+          result = await attemptGeminiSession(text, targetLang);
+        }
+        await setCachedTranslation(text, targetLang, result, eng);
+        return { success: true, text: result, source: eng, targetLang };
+      } catch (err) {
+        console.log(`${eng} translation failed, trying next:`, err.message);
+      }
     }
 
-    // Fallback to Google Translate
-    try {
-      const googleResult = await translateWithGoogle(text, targetLang);
-      await setCachedTranslation(text, targetLang, googleResult, 'google');
-      return { success: true, text: googleResult, source: 'google', targetLang };
-    } catch (googleErr) {
-      return { success: false, error: googleErr.message };
-    }
+    return { success: false, error: 'All translation engines failed' };
   }
 
   // Handle messages from content script
@@ -640,6 +951,19 @@
       const result = chrome.i18n.getMessage(message.key, message.substitutions);
       sendResponse({ message: result });
       return false;
+    }
+
+    if (message.action === 'clearChatGPT') {
+      if (chatgptTabId) {
+        try { chrome.tabs.remove(chatgptTabId); } catch (e) {}
+        chatgptTabId = null;
+      }
+      chrome.storage.local.remove(STORAGE_KEY_CHATGPT_CHAT_URL).then(() => {
+        sendResponse({ success: true });
+      }).catch(() => {
+        sendResponse({ success: false });
+      });
+      return true;
     }
 
     if (message.action !== 'translate') return false;

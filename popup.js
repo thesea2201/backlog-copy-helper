@@ -5,6 +5,7 @@
   const STORAGE_KEY = 'backlogUtilsTargetLang';
   const CACHE_DURATION_KEY = 'backlogUtilsCacheDuration';
   const CUSTOM_PROMPT_KEY = 'backlogUtilsCustomPrompt';
+  const DEFAULT_ENGINE_KEY = 'backlogUtilsDefaultEngine';
   const DEFAULT_CACHE_DAYS = -1; // -1 = never cache (default)
   const CACHE_PREFIX = 'translation_cache_';
 
@@ -41,13 +42,15 @@
   // After settings are loaded we also render the list of cached translations
   renderCacheList();
     try {
-      const result = await chrome.storage.sync.get([STORAGE_KEY, CACHE_DURATION_KEY, CUSTOM_PROMPT_KEY]);
+      const result = await chrome.storage.sync.get([STORAGE_KEY, CACHE_DURATION_KEY, CUSTOM_PROMPT_KEY, DEFAULT_ENGINE_KEY]);
       const lang = result[STORAGE_KEY] || DEFAULT_LANG;
       const cacheDays = result[CACHE_DURATION_KEY] ?? DEFAULT_CACHE_DAYS;
       const customPrompt = result[CUSTOM_PROMPT_KEY] || DEFAULT_CUSTOM_PROMPT;
+      const defaultEngine = result[DEFAULT_ENGINE_KEY] || 'gemini';
       document.getElementById('targetLang').value = lang;
       document.getElementById('cacheDuration').value = String(cacheDays);
       document.getElementById('customPrompt').value = customPrompt;
+      document.getElementById('defaultEngine').value = defaultEngine;
       updateCacheStats();
     } catch (err) {
       console.error('Failed to load settings:', err);
@@ -81,6 +84,16 @@
       showStatus(i18n('statusPromptSaved'));
     } catch (err) {
       console.error('Failed to save custom prompt:', err);
+      showStatus(i18n('statusError'), true);
+    }
+  }
+
+  async function saveDefaultEngine(engine) {
+    try {
+      await chrome.storage.sync.set({ [DEFAULT_ENGINE_KEY]: engine });
+      showStatus(i18n('statusSaved'));
+    } catch (err) {
+      console.error('Failed to save default engine:', err);
       showStatus(i18n('statusError'), true);
     }
   }
@@ -194,6 +207,21 @@
     }
   }
 
+  async function resetChatGPTChat() {
+    if (!confirm(i18n('confirmResetChatGPT'))) {
+      return;
+    }
+
+    try {
+      await chrome.runtime.sendMessage({ action: 'clearChatGPT' });
+      showStatus(i18n('statusChatGPTReset'));
+      console.log('Cleared ChatGPT chat URL');
+    } catch (err) {
+      console.error('Failed to reset ChatGPT chat:', err);
+      showStatus(i18n('statusResetError'), true);
+    }
+  }
+
   function showStatus(message, isError = false) {
     const statusEl = document.getElementById('status');
     statusEl.textContent = message;
@@ -245,6 +273,14 @@
     document.getElementById('savePromptBtn').addEventListener('click', () => {
       const prompt = document.getElementById('customPrompt').value;
       saveCustomPrompt(prompt);
+    });
+
+    document.getElementById('defaultEngine').addEventListener('change', (e) => {
+      saveDefaultEngine(e.target.value);
+    });
+
+    document.getElementById('resetChatGPTBtn').addEventListener('click', () => {
+      resetChatGPTChat();
     });
   }
 

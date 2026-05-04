@@ -102,7 +102,7 @@
     "description": "Rate limit information in footer"
   },
   "engineInfo": {
-    "message": "エンジン: Google Translate API（Gemini 実験的フォールバック付き）",
+    "message": "エンジン: Gemini, ChatGPT（AI）, Google 翻訳",
     "description": "Translation engine information in footer"
   },
   "statusSaved": {
@@ -314,6 +314,42 @@
   "sourceGemini": {
     "message": "Gemini",
     "description": "Translation source name - Gemini"
+  },
+  "menuUseChatGPT": {
+    "message": "ChatGPT のみを使用",
+    "description": "Menu item to use ChatGPT only"
+  },
+  "sourceChatGPT": {
+    "message": "ChatGPT",
+    "description": "Translation source name - ChatGPT"
+  },
+  "resetChatGPTButton": {
+    "message": "ChatGPT チャットセッションをリセット",
+    "description": "Button to reset ChatGPT chat session"
+  },
+  "confirmResetChatGPT": {
+    "message": "ChatGPT チャットセッションをリセットしますか？\n\nこれにより、次回の翻訳時に新しいチャットが開始されます。古いチャット履歴は ChatGPT に残りますが、使用されません。",
+    "description": "Confirmation dialog for resetting ChatGPT chat"
+  },
+  "statusChatGPTReset": {
+    "message": "ChatGPT チャットをリセットしました！次回の翻訳時に新しいチャットが開始されます。",
+    "description": "Message when ChatGPT chat is reset"
+  },
+  "defaultEngineLabel": {
+    "message": "デフォルト翻訳エンジン",
+    "description": "Label for default engine selection"
+  },
+  "engineOptionGemini": {
+    "message": "Gemini（AI）",
+    "description": "Engine option - Gemini"
+  },
+  "engineOptionChatGPT": {
+    "message": "ChatGPT（AI）",
+    "description": "Engine option - ChatGPT"
+  },
+  "engineOptionGoogle": {
+    "message": "Google 翻訳",
+    "description": "Engine option - Google Translate"
   },
   "issueTitleLabel": {
     "message": "タイトル:",
