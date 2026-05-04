@@ -762,7 +762,33 @@
               || lastMsg.querySelector('[data-message-content]')
               || lastMsg;
 
-            const text = (markdownEl.innerText || markdownEl.textContent || '').trim();
+            // Extract inner HTML and convert to text preserving line breaks
+            // innerText can collapse block-level spacing, so we convert HTML manually
+            let html = markdownEl.innerHTML || '';
+            // Replace closing block tags with newlines
+            html = html
+              .replace(/<\/p>/gi, '\n\n')
+              .replace(/<\/div>/gi, '\n')
+              .replace(/<br\s*\/?>/gi, '\n')
+              .replace(/<\/li>/gi, '\n')
+              .replace(/<\/h[1-6]>/gi, '\n\n');
+            // Remove remaining HTML tags
+            html = html.replace(/<[^>]+>/g, '');
+            // Decode HTML entities
+            html = html
+              .replace(/&amp;/g, '&')
+              .replace(/&lt;/g, '<')
+              .replace(/&gt;/g, '>')
+              .replace(/&quot;/g, '"')
+              .replace(/&#x27;/g, "'")
+              .replace(/&#x2F;/g, '/')
+              .replace(/&nbsp;/g, ' ');
+            // Normalize whitespace
+            const text = html
+              .split('\n')
+              .map(line => line.trim())
+              .filter(line => line.length > 0)
+              .join('\n\n');
             if (text.length > 0) {
               return { done: true, text };
             }
