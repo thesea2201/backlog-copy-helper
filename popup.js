@@ -34,9 +34,15 @@
 
   // Default prompt for technical translation (preserves engineering terminology)
   const DEFAULT_CUSTOM_PROMPT = `Translate the following text to {lang}.
-- Keep technical terms, programming concepts, and engineering vocabulary in English
-- Use professional, formal tone
-- Only return the translation, no explanations, no apologies, no comments`;
+Requirements:
+- Keep all technical terms, system names, API names, class names, and identifiers in English (e.g., AnalyzeRiskAction, Subflow, PT, etc.)
+- For domain phrases (e.g., "Integration & Verification"), prioritize clarity:
+  - Either keep original English if it is a standard term
+  - Or translate to {lang} while preserving meaning, optionally include English in parentheses if helpful
+- Use formal, professional tone suitable for technical documentation
+- Prefer natural {lang} phrasing over literal translation
+- Keep structure line-by-line
+- Do not add explanations, comments, or extra text`;
 
   async function loadSettings() {
   // After settings are loaded we also render the list of cached translations
