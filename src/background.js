@@ -223,22 +223,23 @@
     await chrome.storage.local.remove(STORAGE_KEY_CHATGPT_CHAT_URL);
   }
 
-  // Extract chat URL from ChatGPT tab
+  // Extract chat URL from ChatGPT tab via DOM (more reliable than chrome.tabs.get for SPAs)
   // Handles both: /c/<id> (single chat) and /g/<gizmo>/c/<id> (project chat)
   async function extractChatGPTUrlFromTab(tabId) {
     try {
-      const tab = await chrome.tabs.get(tabId);
-      if (!tab.url) return null;
-      // Match /c/<uuid> pattern at end of path
-      const match = tab.url.match(/chatgpt\.com\/(.*)/);
-      if (!match) return null;
-      const path = match[1];
-      // Only save URLs that contain a chat ID (not the main page)
-      if (path.includes('/c/')) {
-        return tab.url;
-      }
-      return null;
+      const results = await chrome.scripting.executeScript({
+        target: { tabId },
+        func: () => {
+          const url = window.location.href;
+          if (url && url.includes('chatgpt.com/c/')) {
+            return url;
+          }
+          return null;
+        }
+      });
+      return results[0]?.result || null;
     } catch (err) {
+      console.error('Error extracting ChatGPT URL:', err);
       return null;
     }
   }
@@ -856,16 +857,11 @@
         await saveChatGPTUrl(chatUrl);
         console.log('New ChatGPT URL saved:', chatUrl);
       } else if (!chatUrl) {
-        // Fallback: try to extract chat URL from DOM (for SPA where URL doesn't change)
+        // Fallback: try to extract chat URL from DOM links
         try {
           const domResults = await chrome.scripting.executeScript({
             target: { tabId },
             func: () => {
-              const shareBtn = document.querySelector('button[data-testid="share-chat-button"]');
-              if (shareBtn) {
-                shareBtn.click();
-                return null;
-              }
               const links = document.querySelectorAll('a[href*="/c/"]');
               for (const link of links) {
                 const href = link.href || link.getAttribute('href');
