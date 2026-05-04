@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.3] - 2026-05-05
+
+### Added
+- **ChatGPT Translation Engine** — translate Backlog content via ChatGPT (tab automation, like Gemini).
+  - Supports both single chat (`/c/<uuid>`) and project chat (`/g/<gizmo>/c/<uuid>`) URL formats.
+  - Automatically reuses the same ChatGPT session across translations (chat URL cached).
+- **Default Engine Selector** — choose your preferred translation engine in Settings: Gemini, ChatGPT, or Google Translate.
+- **Reset ChatGPT Chat Session** button in popup Settings.
+
+### Fixed
+- ChatGPT translation output now preserves line breaks correctly (paragraphs rendered as inline text previously).
+- ChatGPT chat URL now reliably cached using DOM `window.location.href` instead of `chrome.tabs.get()` which returns stale URLs in MV3.
+
 ## [1.3.1] - 2026-04-26
 
 ### Fixed
