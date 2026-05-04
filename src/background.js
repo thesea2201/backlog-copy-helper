@@ -845,17 +845,46 @@
         throw new Error(sendResult?.error || 'Failed to send prompt to ChatGPT');
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const response = await waitForChatGPTResponse(tabId);
 
+      // Extract and save chat URL AFTER response completes
+      // URL may not have updated during the 2s window after sending
       const chatUrl = await extractChatGPTUrlFromTab(tabId);
       console.log('Extracted ChatGPT URL:', chatUrl);
 
       if (chatUrl && chatUrl !== savedUrl) {
         await saveChatGPTUrl(chatUrl);
         console.log('New ChatGPT URL saved:', chatUrl);
+      } else if (!chatUrl) {
+        // Fallback: try to extract chat URL from DOM (for SPA where URL doesn't change)
+        try {
+          const domResults = await chrome.scripting.executeScript({
+            target: { tabId },
+            func: () => {
+              const shareBtn = document.querySelector('button[data-testid="share-chat-button"]');
+              if (shareBtn) {
+                shareBtn.click();
+                return null;
+              }
+              const links = document.querySelectorAll('a[href*="/c/"]');
+              for (const link of links) {
+                const href = link.href || link.getAttribute('href');
+                if (href && href.includes('chatgpt.com/c/')) {
+                  return href;
+                }
+              }
+              return null;
+            }
+          });
+          const domUrl = domResults[0]?.result;
+          if (domUrl) {
+            await saveChatGPTUrl(domUrl);
+            console.log('ChatGPT URL saved from DOM fallback:', domUrl);
+          }
+        } catch (e) {
+          console.log('DOM fallback failed:', e.message);
+        }
       }
-
-      const response = await waitForChatGPTResponse(tabId);
 
       if (originalTabId && originalTabId !== tabId) {
         try {
