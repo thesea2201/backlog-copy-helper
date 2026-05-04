@@ -98,7 +98,7 @@
     "description": "Button to reset Gemini chat session"
   },
   "rateLimitInfo": {
-    "message": "Giới hạn: Tối đa 5 bản dịch mỗi phút",
+    "message": "Giới hạn: Tối đa 15 bản dịch mỗi phút",
     "description": "Rate limit information in footer"
   },
   "engineInfo": {

@@ -98,7 +98,7 @@
     "description": "Button to reset Gemini chat session"
   },
   "rateLimitInfo": {
-    "message": "Rate Limit: Max 5 translations per minute",
+    "message": "Rate Limit: Max 15 translations per minute",
     "description": "Rate limit information in footer"
   },
   "engineInfo": {

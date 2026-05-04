@@ -98,7 +98,7 @@
     "description": "Button to reset Gemini chat session"
   },
   "rateLimitInfo": {
-    "message": "レート制限: 1分あたり最大5回の翻訳",
+    "message": "レート制限: 1分あたり最大15回の翻訳",
     "description": "Rate limit information in footer"
   },
   "engineInfo": {

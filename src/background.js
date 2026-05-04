@@ -2,7 +2,7 @@
   'use strict';
 
   // Rate limiting: max 5 requests per minute
-  const RATE_LIMIT_MAX = 5;
+  const RATE_LIMIT_MAX = 15;
   const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
   let requestTimestamps = [];
 
